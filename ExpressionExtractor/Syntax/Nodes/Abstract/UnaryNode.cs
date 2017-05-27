@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace OMathParser.Syntax.Abstract
+namespace OMathParser.Syntax.Nodes.Abstract
 {
     abstract class UnaryNode : SyntaxNode
     {

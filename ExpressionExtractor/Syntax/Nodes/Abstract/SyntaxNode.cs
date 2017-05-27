@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 using OMathParser.Utils;
 
-namespace OMathParser.Syntax.Abstract
+namespace OMathParser.Syntax.Nodes.Abstract
 {
     abstract class SyntaxNode : ISimplifiable
     {

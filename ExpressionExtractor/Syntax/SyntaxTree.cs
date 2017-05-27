@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using OMathParser.Syntax.Abstract;
+using OMathParser.Syntax.Nodes.Abstract;
 
 namespace OMathParser.Syntax
 {

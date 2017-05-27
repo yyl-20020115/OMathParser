@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 
-namespace OMathParser.Syntax.Abstract
+namespace OMathParser.Syntax.Nodes.Abstract
 {
     abstract class BinaryNode : SyntaxNode
     {

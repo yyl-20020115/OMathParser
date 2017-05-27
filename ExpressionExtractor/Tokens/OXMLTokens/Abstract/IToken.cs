@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 using OMathParser.Utils;
 
-namespace OMathParser.Tokens.Abstract
+namespace OMathParser.Tokens.OXMLTokens.Abstract
 {
     public interface IToken : ISimplifiable
     {

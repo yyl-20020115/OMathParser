@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace OMathParser.Tokens.Abstract
+namespace OMathParser.Tokens.OXMLTokens.Abstract
 {
     abstract class AbstractToken : IToken
     {

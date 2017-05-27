@@ -5,10 +5,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using OMathParser.Tokens.Abstract;
 using OMathParser.Utils;
+using OMathParser.Tokens.OXMLTokens.Abstract;
 
-namespace OMathParser.Tokens
+namespace OMathParser.Tokens.OXMLTokens
 {
     public class TokenList : List<IToken>, IToken, ISimplifiable
     {

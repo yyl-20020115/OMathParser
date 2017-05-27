@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using OMathParser.Tokens.Abstract;
+using OMathParser.Tokens.OXMLTokens.Abstract;
 
-namespace OMathParser.Tokens
+namespace OMathParser.Tokens.OXMLTokens
 {
     class ParenthesesToken : AbstractToken
     {

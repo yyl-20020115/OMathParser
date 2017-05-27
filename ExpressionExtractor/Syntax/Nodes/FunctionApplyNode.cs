@@ -1,11 +1,12 @@
-﻿using OMathParser.Syntax.Abstract;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace OMathParser.Syntax
+using OMathParser.Syntax.Nodes.Abstract;
+
+namespace OMathParser.Syntax.Nodes
 {
     class FunctionApplyNode : UnaryNode
     {

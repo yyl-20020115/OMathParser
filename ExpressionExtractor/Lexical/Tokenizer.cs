@@ -1,0 +1,180 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+using OMathParser.Utils;
+using System.Text.RegularExpressions;
+
+namespace OMathParser.Lexical
+{
+    public class Tokenizer
+    {
+        private ParseProperties properties;
+
+        public Tokenizer(ParseProperties properties)
+        {
+            this.properties = properties;
+        }
+
+        public List<Lexeme> Tokenize(String run)
+        {
+            List<Lexeme> lexemes = new List<Lexeme>();
+
+            int i = 0;
+
+            while (i < run.Length)
+            {
+                char current = run[i];
+                if (Char.IsWhiteSpace(current))
+                {
+                    i++;
+                }
+                else if (current == '=')
+                {
+                    i++;
+                    lexemes.Add(new Lexeme(Lexeme.LexemeType.EQ_SIGN, current.ToString()));
+                }
+                else if (current == '+')
+                {
+                    i++;
+                    lexemes.Add(new Lexeme(Lexeme.LexemeType.OP_PLUS, current.ToString()));
+                }
+                else if (current == '-')
+                {
+                    i++;
+                    lexemes.Add(new Lexeme(Lexeme.LexemeType.OP_MINUS, current.ToString()));
+                }
+                else if (current == '*')
+                {
+                    i++;
+                    lexemes.Add(new Lexeme(Lexeme.LexemeType.OP_MUL, current.ToString()));
+                }
+                else if (current == '/' || current == '÷')
+                {
+                    i++;
+                    lexemes.Add(new Lexeme(Lexeme.LexemeType.OP_DIV, current.ToString()));
+                }
+                else if (current == '(')
+                {
+                    i++;
+                    lexemes.Add(new Lexeme(Lexeme.LexemeType.LEFT_PAREN, current.ToString()));
+                }
+                else if (current == ')')
+                {
+                    i++;
+                    lexemes.Add(new Lexeme(Lexeme.LexemeType.RIGHT_PAREN, current.ToString()));
+                }
+                else
+                {
+                    Lexeme matched = matchFunctionName(run, i);
+                    if (matched != null)
+                    {
+                        lexemes.Add(matched);
+                        i += matched.Value.Length;
+                        continue;
+                    }
+
+                    matched = matchIdentifierName(run, i);
+                    if (matched != null)
+                    {
+                        lexemes.Add(matched);
+                        i += matched.Value.Length;
+                        continue;
+                    }
+
+                    matched = matchNumericLiteral(run, i);
+                    if (matched != null)
+                    {
+                        lexemes.Add(matched);
+                        i += matched.Value.Length;
+                        continue;
+                    }
+
+                    throw new LexicalException(run, i);
+                }
+            }
+
+            return lexemes;
+        }
+
+        private Lexeme matchFunctionName(string input, int startPos)
+        {
+            HashSet<String> matches = new HashSet<string>();
+            foreach (KeyValuePair<String, int> functionDeclaration in properties.Functions)
+            {
+                if (matchesFromPosition(input, startPos, functionDeclaration.Key))
+                {
+                    matches.Add(functionDeclaration.Key);
+                }
+            }
+
+            if (matches.Count == 0)
+            {
+                return null;
+            }
+            else
+            {
+                return new Lexeme(Lexeme.LexemeType.FUNCTION_NAME, matches.OrderBy(s => s.Length).First());
+            }
+        }
+
+        private Lexeme matchIdentifierName(string input, int startPos)
+        {
+            HashSet<String> matches = new HashSet<string>();
+            foreach (String name in properties.Identifiers)
+            {
+                if (matchesFromPosition(input, startPos, name))
+                {
+                    matches.Add(name);
+                }
+            }
+
+            if (matches.Count == 0)
+            {
+                return null;
+            }
+            else
+            {
+                return new Lexeme(Lexeme.LexemeType.IDENTIFIER, matches.OrderBy(s => s.Length).First());
+            }
+        }
+
+        private Lexeme matchNumericLiteral(string input, int startPos)
+        {
+            String pattern = @"\A[-+]?(0?|[1-9][0-9]*)(\.[0-9]*[1-9])?([eE][-+]?(0|[1-9][0-9]*))?";
+            String inputSubstring = input.Substring(startPos, input.Length - startPos);
+            Match m = Regex.Match(inputSubstring, pattern);
+            if (m.Success && !String.IsNullOrEmpty(m.Value))
+            {
+                return new Lexeme(Lexeme.LexemeType.REAL_VALUE, m.Value);
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        private bool matchesFromPosition(string input, int startPos, String value)
+        {
+            try
+            {
+                for (int i = 0; i < value.Length; i++)
+                {
+                    if (input[startPos + i] != value[i])
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+            catch (IndexOutOfRangeException ex)
+            {
+                return false;
+            }
+            
+        }
+    }
+}
