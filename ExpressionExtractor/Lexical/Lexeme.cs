@@ -5,13 +5,16 @@ using System.Text;
 using System.Threading.Tasks;
 
 using OMathParser.Utils;
+using OMathParser.Syntax.Nodes.Abstract;
+using OMathParser.Tokens.OXMLTokens.Abstract;
 
 namespace OMathParser.Lexical
 {
-    public class Lexeme : ISimplifiable
+    public class Lexeme : ISimplifiable, ISyntaxUnit, IToken
     {
         public enum LexemeType {
-            IDENTIFIER,
+            IDENTIFIER_VAR,
+            IDENTIFIER_CONST,
             FUNCTION_NAME,
             REAL_VALUE,
             LEFT_PAREN,
@@ -20,11 +23,13 @@ namespace OMathParser.Lexical
             OP_MINUS,
             OP_MUL,
             OP_DIV,
-            EQ_SIGN
+            EQ_SIGN,
+            ARGUMENT_SEPARATOR
         }
 
         private LexemeType type;
         private String value;
+        private IToken parent;
 
         public Lexeme(LexemeType t, String value)
         {
@@ -34,6 +39,7 @@ namespace OMathParser.Lexical
 
         public LexemeType Type { get => type; set => type = value; }
         public String Value { get => value; set => this.value = value; }
+        public IToken Parent { get => null; set => this.parent = value; }
 
         public string simpleRepresentation()
         {

@@ -24,5 +24,8 @@ namespace OMathParser.Tokens.OXMLTokens
         {
             return String.Format("Radical: deg=({0}), base=({1})", degree.simpleRepresentation(), radBase.simpleRepresentation());
         }
+
+        public TokenList Base { get => radBase; }
+        public TokenList Degree { get => degree; }
     }
 }

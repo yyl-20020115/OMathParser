@@ -8,7 +8,7 @@ using OMathParser.Utils;
 
 namespace OMathParser.Syntax.Nodes.Abstract
 {
-    abstract class SyntaxNode : ISimplifiable
+    public abstract class SyntaxNode : ISimplifiable, ISyntaxUnit
     {
         protected SyntaxNode parent;
 

@@ -24,5 +24,8 @@ namespace OMathParser.Tokens.OXMLTokens
         {
             return String.Format("Func: name=({0}), base=({1})", funcName.simpleRepresentation(), funcBase.simpleRepresentation());
         }
+
+        public TokenList FunctionName { get => funcName; }
+        public TokenList Arguments { get => funcBase; }
     }
 }

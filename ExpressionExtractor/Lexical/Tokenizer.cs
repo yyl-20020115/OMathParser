@@ -36,6 +36,11 @@ namespace OMathParser.Lexical
                     i++;
                     lexemes.Add(new Lexeme(Lexeme.LexemeType.EQ_SIGN, current.ToString()));
                 }
+                else if (current == ',')
+                {
+                    i++;
+                    lexemes.Add(new Lexeme(Lexeme.LexemeType.ARGUMENT_SEPARATOR, current.ToString()));
+                }
                 else if (current == '+')
                 {
                     i++;
@@ -76,7 +81,15 @@ namespace OMathParser.Lexical
                         continue;
                     }
 
-                    matched = matchIdentifierName(run, i);
+                    matched = matchVariableIdentifier(run, i);
+                    if (matched != null)
+                    {
+                        lexemes.Add(matched);
+                        i += matched.Value.Length;
+                        continue;
+                    }
+
+                    matched = matchConstantIdentifier(run, i);
                     if (matched != null)
                     {
                         lexemes.Add(matched);
@@ -120,10 +133,31 @@ namespace OMathParser.Lexical
             }
         }
 
-        private Lexeme matchIdentifierName(string input, int startPos)
+        private Lexeme matchConstantIdentifier(string input, int startPos)
         {
             HashSet<String> matches = new HashSet<string>();
-            foreach (String name in properties.Identifiers)
+            foreach (KeyValuePair<String, double> constant in properties.ConstantIdentifiers)
+            {
+                if (matchesFromPosition(input, startPos, constant.Key))
+                {
+                    matches.Add(constant.Key);
+                }
+            }
+
+            if (matches.Count == 0)
+            {
+                return null;
+            }
+            else
+            {
+                return new Lexeme(Lexeme.LexemeType.IDENTIFIER_CONST, matches.OrderBy(s => s.Length).First());
+            }
+        }
+
+        private Lexeme matchVariableIdentifier(string input, int startPos)
+        {
+            HashSet<String> matches = new HashSet<string>();
+            foreach (String name in properties.VariableIdentifiers)
             {
                 if (matchesFromPosition(input, startPos, name))
                 {
@@ -137,7 +171,7 @@ namespace OMathParser.Lexical
             }
             else
             {
-                return new Lexeme(Lexeme.LexemeType.IDENTIFIER, matches.OrderBy(s => s.Length).First());
+                return new Lexeme(Lexeme.LexemeType.IDENTIFIER_VAR, matches.OrderBy(s => s.Length).First());
             }
         }
 

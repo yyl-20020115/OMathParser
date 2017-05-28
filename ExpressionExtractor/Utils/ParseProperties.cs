@@ -4,29 +4,46 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using OMathParser.Syntax.Nodes;
+
 namespace OMathParser.Utils
 {
     public class ParseProperties
     {
         private ISet<String> identifiers;
-        private IDictionary<String, int> functions;
+        private IDictionary<String, double> constants;
+        private IDictionary<String, int> functionDeclarations;
+        private IDictionary<String, FunctionApplyNode.FunctionBody> functionDefinitions;
         private ISet<Char> specialCharacters;
 
         public ParseProperties()
         {
             identifiers = new HashSet<String>();
-            functions = new Dictionary<String, int>();
+            constants = new Dictionary<String, double>();
+            functionDeclarations = new Dictionary<String, int>();
             specialCharacters = new HashSet<Char>();
 
+            populateConstants();
             populateBasicFunctions();
             populateSpecialCharacters();
         }
 
+        private void populateConstants()
+        {
+            constants.Add("π", Math.PI);
+            constants.Add("e", Math.E);
+        }
+
         private void populateBasicFunctions()
         {
-            functions.Add("sin", 1);
-            functions.Add("cos", 1);
-            functions.Add("tan", 1);
+            functionDeclarations.Add("sin", 1);
+            functionDefinitions.Add("sin", arguments => Math.Sin(arguments[0]));
+
+            functionDeclarations.Add("cos", 1);
+            functionDefinitions.Add("cos", arguments => Math.Cos(arguments[0]));
+
+            functionDeclarations.Add("tan", 1);
+            functionDefinitions.Add("tan", arguments => Math.Tan(arguments[0]));
         }
 
         private void populateSpecialCharacters()
@@ -39,14 +56,20 @@ namespace OMathParser.Utils
             specialCharacters.Add(')');
         }
 
-        public void addIdentifier(String identifier)
+        public void addVariableIdentifier(String identifier)
         {
             this.identifiers.Add(identifier);
         }
 
-        public void addFunction(String functionName, int numArguments)
+        public void addConstantIdentifier(String name, double value)
         {
-            functions.Add(functionName.Trim(), numArguments);
+            this.constants.Add(name, value);
+        }
+
+        public void AddFunction(String functionName, int numArguments, FunctionApplyNode.FunctionBody definition)
+        {
+            functionDeclarations.Add(functionName.Trim(), numArguments);
+            functionDefinitions.Add(functionName.Trim(), definition);
         }
 
         public void addSpecialChar(Char specialChar)
@@ -54,8 +77,55 @@ namespace OMathParser.Utils
             this.specialCharacters.Add(specialChar);
         }
 
-        public IEnumerable<String> Identifiers => identifiers.AsEnumerable();
-        public IEnumerable<KeyValuePair<String, int>> Functions => functions.AsEnumerable();
+        public Double getConstantValue(String name)
+        {
+            double value;
+            if (constants.TryGetValue(name, out value))
+            {
+                return value;
+            }
+            else
+            {
+                throw new ParseException("No constant declaration found for constant name: " + name);
+            }
+            
+        }
+
+        public bool isFunctionNameDeclared(String name)
+        {
+            return functionDeclarations.ContainsKey(name);
+        }
+
+        public FunctionApplyNode.FunctionBody getFunctionDefinition(String fName)
+        {
+            FunctionApplyNode.FunctionBody definition;
+            if (functionDefinitions.TryGetValue(fName, out definition))
+            {
+                return definition;
+            }
+            else
+            {
+                throw new ParseException("No function definition found for function name: " + fName);
+            }
+
+        }
+
+        public int getFunctionArgumentsCount(String fName)
+        {
+            int nArguments;
+            if (functionDeclarations.TryGetValue(fName, out nArguments))
+            {
+                return nArguments;
+            }
+            else
+            {
+                throw new ParseException("No function declaration found for function name: " + fName);
+            }
+        }
+
+        public IEnumerable<String> VariableIdentifiers => identifiers.AsEnumerable();
+        public IEnumerable<KeyValuePair<String, double>> ConstantIdentifiers => constants.AsEnumerable();
+        public IEnumerable<KeyValuePair<String, int>> Functions => functionDeclarations.AsEnumerable();
         public IEnumerable<Char> SpecialChars => specialCharacters.AsEnumerable();
     }
 }

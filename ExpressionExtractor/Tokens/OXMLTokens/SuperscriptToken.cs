@@ -34,5 +34,8 @@ namespace OMathParser.Tokens.OXMLTokens
         {
             return String.Format("Superscript: base=({0}), arg=({1})", supBase.simpleRepresentation(), supArgument.simpleRepresentation());
         }
+
+        public TokenList Base { get => supBase; }
+        public TokenList Argument { get => supArgument; }
     }
 }

@@ -8,27 +8,30 @@ using OMathParser.Syntax.Nodes.Abstract;
 
 namespace OMathParser.Syntax.Nodes
 {
-    class FunctionApplyNode : UnaryNode
+    public class FunctionApplyNode : SyntaxNode
     {
         private String name;
+        private int nArguments;
+        private ArgumentListNode arguments;
 
-        public delegate double function(double input);
-        private function funcDefinition;
+        public delegate double FunctionBody(double[] input);
+        private FunctionBody funcDefinition;
 
-        public FunctionApplyNode(SyntaxNode argument, function funcDefinition, String name) : base(argument)
+        public FunctionApplyNode(ArgumentListNode arguments, FunctionBody funcDefinition, String name)
         {
             this.name = name;
             this.funcDefinition = funcDefinition;
+            this.arguments = arguments;
         }
 
         public override double getValue()
         {
-            return funcDefinition(child.getValue());
+            return funcDefinition(arguments.CalculatedValues);
         }
 
         public override string simpleRepresentation()
         {
-            return String.Format("FuncApply: {0}({1}) ", name, child.simpleRepresentation());
+            return String.Format("FuncApply: {0}({1}) ", name, arguments.simpleRepresentation());
         }
     }
 }

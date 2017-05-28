@@ -34,5 +34,8 @@ namespace OMathParser.Tokens.OXMLTokens
         {
             return String.Format("Fraction: num=({0}), den=({1})", numerator.simpleRepresentation(), denominator.simpleRepresentation());
         }
+
+        public TokenList Numerator { get => numerator; }
+        public TokenList Denominator { get => denominator; }
     }
 }
