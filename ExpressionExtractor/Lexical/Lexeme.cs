@@ -52,12 +52,14 @@ namespace OMathParser.Lexical
 
         private LexemeType type;
         private String value;
+        private int precedence;
         private IToken parent;
 
         public Lexeme(LexemeType t, String value)
         {
             this.type = t;
             this.value = value;
+            this.precedence = precedenceMap[t];
         }
 
         public LexemeType Type { get => type; set => type = value; }
@@ -66,26 +68,12 @@ namespace OMathParser.Lexical
 
         public bool isHigherPrecedence(Lexeme other)
         {
-            if (this.type == other.type)
-            {
-                return false;
-            }
-
-            int thisPrecedence = precedenceMap[this.type];
-            int otherPrecedence = precedenceMap[other.type];
-            return thisPrecedence > otherPrecedence;
+            return this.precedence > other.precedence;
         }
 
         public bool isLowerPrecedence(Lexeme other)
         {
-            if (this.type == other.type)
-            {
-                return false;
-            }
-
-            int thisPrecedence = precedenceMap[this.type];
-            int otherPrecedence = precedenceMap[other.type];
-            return thisPrecedence < otherPrecedence;
+            return this.precedence < other.precedence;
         }
 
         public string simpleRepresentation()
