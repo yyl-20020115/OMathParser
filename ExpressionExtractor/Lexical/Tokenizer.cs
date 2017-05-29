@@ -61,6 +61,11 @@ namespace OMathParser.Lexical
                     i++;
                     lexemes.Add(new Lexeme(Lexeme.LexemeType.OP_DIV, current.ToString()));
                 }
+                else if (current == '^')
+                {
+                    i++;
+                    lexemes.Add(new Lexeme(Lexeme.LexemeType.OP_POW, current.ToString()));
+                }
                 else if (current == '(')
                 {
                     i++;
