@@ -22,7 +22,7 @@ namespace OMathParser.Syntax
         private Queue<IToken> input;
         private List<IToken> processed;
         private Queue<ISyntaxUnit> output;
-        private Stack<IToken> operatorStack;
+        private Stack<Lexeme> operatorStack;
 
         private IToken lastProcessedInput;
 
@@ -34,7 +34,7 @@ namespace OMathParser.Syntax
             this.input = new Queue<IToken>();
             this.processed = new List<IToken>();
             this.output = new Queue<ISyntaxUnit>();
-            this.operatorStack = new Stack<IToken>();
+            this.operatorStack = new Stack<Lexeme>();
             
             populateInputQueue(tokens);
         }
@@ -58,9 +58,21 @@ namespace OMathParser.Syntax
             }
         }
 
+        private IToken peekNextInput()
+        {
+            return input.Peek();
+        }
+
+        private IToken pollNextInput()
+        {
+            IToken next = input.Dequeue();
+            lastProcessedInput = next;
+            return next;
+        }
+
         public SyntaxNode parse()
         {
-            IToken current = input.Dequeue();
+            IToken current = pollNextInput();
             if (canProduceValue(current))
             {
                 // LexemeTypes: REAL_VALUE, IDENTIFIER_CONST and IDENTIFIER_VAR are processed here
@@ -84,9 +96,17 @@ namespace OMathParser.Syntax
                 }
                 else if (type == Lexeme.LexemeType.OP_PLUS)
                 {
-                    // TODO: tu si stal!!!!!
+                    if (canProcessTokenAsUnaryOp())
+                    {
+                        operatorStack.Push(new Lexeme(Lexeme.LexemeType.OP_PLUS_UNARY, "+"));
+                    }
+                    else
+                    {
+
+                    }
                 }
             }
+
         }
 
         private void pushValueProducerToOutput(IToken t)
@@ -140,6 +160,27 @@ namespace OMathParser.Syntax
                 {
                     return true;
                 }
+            }
+
+            return false;
+        }
+
+        private bool canProcessTokenAsUnaryOp()
+        {
+            if (lastProcessedInput == null)
+            {
+                return true;
+            }
+            else if (lastProcessedInput is Lexeme)
+            {
+                Lexeme previous = lastProcessedInput as Lexeme;
+                Lexeme.LexemeType type = previous.Type;
+                return type == Lexeme.LexemeType.LEFT_PAREN ||
+                        type == Lexeme.LexemeType.EQ_SIGN ||
+                        type == Lexeme.LexemeType.OP_DIV ||
+                        type == Lexeme.LexemeType.OP_MUL ||
+                        type == Lexeme.LexemeType.OP_MINUS ||
+                        type == Lexeme.LexemeType.OP_PLUS;
             }
 
             return false;
@@ -284,7 +325,7 @@ namespace OMathParser.Syntax
 
         private void processFunctionNameLexeme(Lexeme fName)
         {
-            IToken next = input.Dequeue();
+            IToken next = pollNextInput();
             if (next is ParenthesesToken)
             {
                 int nArguments = properties.getFunctionArgumentsCount(fName.Value);
@@ -304,7 +345,7 @@ namespace OMathParser.Syntax
             else if (next is Lexeme && (next as Lexeme).Type == Lexeme.LexemeType.LEFT_PAREN)
             {
                 operatorStack.Push(fName);
-                operatorStack.Push(next);
+                operatorStack.Push(next as Lexeme);
             }
             else
             {
@@ -342,7 +383,7 @@ namespace OMathParser.Syntax
                     }
                     catch (InvalidOperationException ex)
                     {
-
+                        // do nothing, operator stack remains empty
                     }
 
                     return;
