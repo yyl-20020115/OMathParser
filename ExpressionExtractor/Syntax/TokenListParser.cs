@@ -98,15 +98,85 @@ namespace OMathParser.Syntax
                 {
                     if (canProcessTokenAsUnaryOp())
                     {
-                        operatorStack.Push(new Lexeme(Lexeme.LexemeType.OP_PLUS_UNARY, "+"));
+                        pushOperator(new Lexeme(Lexeme.LexemeType.OP_PLUS_UNARY, "+"));
                     }
                     else
                     {
-
+                        pushOperator(currentLexeme);
                     }
+                }
+                else if (type == Lexeme.LexemeType.OP_MINUS)
+                {
+                    if (canProcessTokenAsUnaryOp())
+                    {
+                        pushOperator(new Lexeme(Lexeme.LexemeType.OP_MINUS_UNARY, "-"));
+                    }
+                    else
+                    {
+                        pushOperator(currentLexeme);
+                    }
+                }
+                else if (type == Lexeme.LexemeType.OP_MUL ||
+                         type == Lexeme.LexemeType.OP_DIV ||
+                         type == Lexeme.LexemeType.OP_POW)
+                {
+                    pushOperator(currentLexeme);
                 }
             }
 
+        }
+
+        private void pushOperator(Lexeme op)
+        {
+            if (!op.IsOperator())
+            {
+                throw new ParseException("Cannot push a non-operator token onto the operator stack!");
+            }
+
+            if (op.IsRightAssociative())
+            {
+                // pushing a right-associative operator
+                try
+                {
+                    Lexeme top = operatorStack.Peek();
+                    while (top.Type != Lexeme.LexemeType.LEFT_PAREN && !top.IsHigherPrecedence(op))
+                    {
+                        // pop the top of the stack into the output queue as long as it isn't 
+                        // an opening parenthesis or its precedence is lower or equal to that of
+                        // the operator being pushed onto the stack
+                        output.Enqueue(operatorStack.Pop());
+                        top = operatorStack.Peek();
+                    }
+                }
+                catch (InvalidOperationException ex)
+                {
+                    // operator stack is empty, continue with pushing operator
+                }
+
+                operatorStack.Push(op);
+            }
+            else
+            {
+                // pushing a left-associative operator
+                try
+                {
+                    Lexeme top = operatorStack.Peek();
+                    while (top.Type != Lexeme.LexemeType.LEFT_PAREN && top.IsLowerPrecedence(op))
+                    {
+                        // pop the top of the stack into the output queue as long as it isn't 
+                        // an opening parenthesis or its precedence is lower to that of
+                        // the operator being pushed onto the stack
+                        output.Enqueue(operatorStack.Pop());
+                        top = operatorStack.Peek();
+                    }
+                }
+                catch (InvalidOperationException ex)
+                {
+                    // operator stack is empty, continue with pushing operator
+                }
+
+                operatorStack.Push(op);
+            }
         }
 
         private void pushValueProducerToOutput(IToken t)
@@ -358,7 +428,7 @@ namespace OMathParser.Syntax
         {
             while (true)
             {
-                IToken popped;
+                Lexeme popped;
                 try
                 {
                     popped = operatorStack.Pop();
@@ -368,7 +438,7 @@ namespace OMathParser.Syntax
                     throw new ParseException("Mismatched parentheses!");
                 }
 
-                if (popped is Lexeme && (popped as Lexeme).Type == Lexeme.LexemeType.LEFT_PAREN)
+                if (popped.Type == Lexeme.LexemeType.LEFT_PAREN)
                 {
                     try
                     {
@@ -388,8 +458,11 @@ namespace OMathParser.Syntax
 
                     return;
                 }
+                else
+                {
+                    output.Enqueue(popped);
+                }
             }
         }
-
     }
 }
