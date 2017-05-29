@@ -24,7 +24,9 @@ namespace OMathParser.Lexical
             OP_MUL,
             OP_DIV,
             EQ_SIGN,
-            ARGUMENT_SEPARATOR
+            ARGUMENT_SEPARATOR,
+            OP_PLUS_UNARY,
+            OP_MINUS_UNARY
         }
 
         private LexemeType type;
