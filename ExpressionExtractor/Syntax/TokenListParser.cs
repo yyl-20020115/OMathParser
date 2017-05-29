@@ -24,6 +24,8 @@ namespace OMathParser.Syntax
         private Queue<ISyntaxUnit> output;
         private Stack<IToken> operatorStack;
 
+        private IToken lastProcessedInput;
+
         public TokenListParser(ParseProperties properties, TokenList tokens)
         {
             this.properties = properties;
