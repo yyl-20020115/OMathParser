@@ -29,6 +29,27 @@ namespace OMathParser.Lexical
             OP_MINUS_UNARY
         }
 
+        private static Dictionary<LexemeType, int> precedenceMap;
+
+        static Lexeme()
+        {
+            precedenceMap = new Dictionary<LexemeType, int>();
+            precedenceMap.Add(LexemeType.IDENTIFIER_VAR, -1);
+            precedenceMap.Add(LexemeType.IDENTIFIER_CONST, -1);
+            precedenceMap.Add(LexemeType.FUNCTION_NAME, -1);
+            precedenceMap.Add(LexemeType.REAL_VALUE, -1);
+            precedenceMap.Add(LexemeType.LEFT_PAREN, -1);
+            precedenceMap.Add(LexemeType.RIGHT_PAREN, -1);
+            precedenceMap.Add(LexemeType.OP_PLUS, 2);
+            precedenceMap.Add(LexemeType.OP_MINUS, 2);
+            precedenceMap.Add(LexemeType.OP_MUL, 3);
+            precedenceMap.Add(LexemeType.OP_DIV, 3);
+            precedenceMap.Add(LexemeType.EQ_SIGN, 1);
+            precedenceMap.Add(LexemeType.ARGUMENT_SEPARATOR, -1);
+            precedenceMap.Add(LexemeType.OP_PLUS_UNARY, 4);
+            precedenceMap.Add(LexemeType.OP_MINUS_UNARY, 4);
+        }
+
         private LexemeType type;
         private String value;
         private IToken parent;
@@ -42,6 +63,30 @@ namespace OMathParser.Lexical
         public LexemeType Type { get => type; set => type = value; }
         public String Value { get => value; set => this.value = value; }
         public IToken Parent { get => null; set => this.parent = value; }
+
+        public bool isHigherPrecedence(Lexeme other)
+        {
+            if (this.type == other.type)
+            {
+                return false;
+            }
+
+            int thisPrecedence = precedenceMap[this.type];
+            int otherPrecedence = precedenceMap[other.type];
+            return thisPrecedence > otherPrecedence;
+        }
+
+        public bool isLowerPrecedence(Lexeme other)
+        {
+            if (this.type == other.type)
+            {
+                return false;
+            }
+
+            int thisPrecedence = precedenceMap[this.type];
+            int otherPrecedence = precedenceMap[other.type];
+            return thisPrecedence < otherPrecedence;
+        }
 
         public string simpleRepresentation()
         {
