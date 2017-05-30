@@ -26,6 +26,8 @@ namespace OMathParser.Tokens.OXMLTokens
             return String.Format("Parentheses: ({0})", elements.simpleRepresentation());
         }
 
+        public char BeginChar { get => this.beginChar; }
+        public char EndChar { get => this.endChar; }
         public TokenList Elements { get => elements; }
     }
 }

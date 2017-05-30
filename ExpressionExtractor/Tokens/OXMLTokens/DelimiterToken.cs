@@ -28,6 +28,9 @@ namespace OMathParser.Tokens.OXMLTokens
             this.elements.Add(element);
         }
 
+        public char BeginChar { get => this.beginChar; }
+        public char EndChar { get => this.endChar; }
+        public char Delimiter { get => this.delimiter; }
         public List<IToken> Elements { get => this.elements; }
 
         public override string simpleRepresentation()
