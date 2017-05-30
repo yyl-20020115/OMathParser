@@ -41,7 +41,12 @@ namespace OMathParser.Syntax.Nodes
                 sb.Append(arg);
                 sb.Append(", ");
             }
-            sb.Remove(sb.Length - 2, 2);
+
+            if (arguments.Count > 1)
+            {
+                sb.Remove(sb.Length - 2, 2);
+            }
+            
             return "ArgumentList: [" + sb.ToString() + "]";
         }
 

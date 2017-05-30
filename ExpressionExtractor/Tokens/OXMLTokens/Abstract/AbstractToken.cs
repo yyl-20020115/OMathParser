@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace OMathParser.Tokens.OXMLTokens.Abstract
 {
-    abstract class AbstractToken : IToken
+    public abstract class AbstractToken : IToken
     {
         protected IToken parent;
 

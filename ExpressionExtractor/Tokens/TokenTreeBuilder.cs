@@ -187,7 +187,16 @@ namespace OMathParser.Tokens
             var delimiterElements = d.Elements<Base>();
             if (delimiterElements.Count() > 1)
             {
-                throw new NotImplementedException("No handler implemented for Delimiter with multiple bases.");
+                char separator = dp.SeparatorChar == null ? '|' : dp.SeparatorChar.Val.ToString().Trim().ElementAt(0);
+                DelimiterToken delimiterToken = new DelimiterToken(beginChar, endChar, separator);
+
+                foreach (var element in delimiterElements)
+                {
+                    var processedElement = processElement(element);
+                    delimiterToken.AddElement(processedElement);
+                }
+
+                return delimiterToken;
             }
             else
             {

@@ -66,6 +66,7 @@
     <Compile Include="Syntax\SyntaxTreeBuilder.cs" />
     <Compile Include="Syntax\Nodes\UnaryMinusNode.cs" />
     <Compile Include="Syntax\TokenListParser.cs" />
+    <Compile Include="Tokens\OXMLTokens\DelimiterToken.cs" />
     <Compile Include="Tokens\OXMLTokens\Abstract\AbstractToken.cs" />
     <Compile Include="Tokens\OXMLTokens\FractionToken.cs" />
     <Compile Include="Tokens\OXMLTokens\FunctionApplyToken.cs" />

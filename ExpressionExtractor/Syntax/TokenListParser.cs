@@ -389,8 +389,8 @@ namespace OMathParser.Syntax
 
         private ArgumentListNode parseArgumentList(ParenthesesToken argumentList)
         {
-            // TODO:
-            throw new NotImplementedException();
+            ArgumentListNode argumentListNode = new ArgumentListNode();
+            argumentList.Chi
         }
 
         private void processFunctionNameLexeme(Lexeme fName)
