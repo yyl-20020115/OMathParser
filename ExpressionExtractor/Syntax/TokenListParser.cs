@@ -25,6 +25,7 @@ namespace OMathParser.Syntax
         private Stack<Lexeme> operatorStack;
 
         private IToken lastProcessedInput;
+        private int openedArgumentLists;
 
         public TokenListParser(ParseProperties properties, TokenList tokens)
         {
@@ -35,7 +36,10 @@ namespace OMathParser.Syntax
             this.processed = new List<IToken>();
             this.output = new Queue<ISyntaxUnit>();
             this.operatorStack = new Stack<Lexeme>();
-            
+
+            this.lastProcessedInput = null;
+            this.openedArgumentLists = 0;
+
             populateInputQueue(tokens);
         }
 
@@ -118,9 +122,18 @@ namespace OMathParser.Syntax
                 }
                 else if (type == Lexeme.LexemeType.OP_MUL ||
                          type == Lexeme.LexemeType.OP_DIV ||
-                         type == Lexeme.LexemeType.OP_POW)
+                         type == Lexeme.LexemeType.OP_POW ||
+                         type == Lexeme.LexemeType.EQ_SIGN)
                 {
                     pushOperator(currentLexeme);
+                }
+                else if (type == Lexeme.LexemeType.ARGUMENT_SEPARATOR)
+                {
+                    processArgumentSeparator();
+                }
+                else
+                {
+                    throw new ParseException("Unknown token type encountered in input.");
                 }
             }
 
@@ -379,7 +392,7 @@ namespace OMathParser.Syntax
             return new RadicalNode(baseNode, degreeNode);
         }
 
-        
+
 
         private ArgumentListNode parseArgumentList(TokenList argumentList)
         {
@@ -389,8 +402,27 @@ namespace OMathParser.Syntax
 
         private ArgumentListNode parseArgumentList(ParenthesesToken argumentList)
         {
+            // TODO:
+            throw new NotImplementedException();
+        }
+
+        private ArgumentListNode parseArgumentList(DelimiterToken argumentList)
+        {
+            if (argumentList.BeginChar != '(' || argumentList.EndChar != ')' || argumentList.Delimiter != ',')
+            {
+                throw new ParseException(argumentList.simpleRepresentation() +
+                    " cannot be used as an argument list for a function call.");
+            }
+
             ArgumentListNode argumentListNode = new ArgumentListNode();
-            argumentList.Chi
+            foreach (TokenList argument in argumentList.Elements)
+            {
+                TokenListParser argumentParser = new TokenListParser(properties, argument);
+                SyntaxNode argumentRootNode = argumentParser.parse();
+                argumentListNode.addArgument(argumentRootNode);
+            }
+
+            return argumentListNode;
         }
 
         private void processFunctionNameLexeme(Lexeme fName)
@@ -414,12 +446,13 @@ namespace OMathParser.Syntax
             }
             else if (next is Lexeme && (next as Lexeme).Type == Lexeme.LexemeType.LEFT_PAREN)
             {
+                openedArgumentLists++;
                 operatorStack.Push(fName);
                 operatorStack.Push(next as Lexeme);
             }
             else
             {
-                throw new ParseException("Missing argument list for function call: " 
+                throw new ParseException("Missing argument list for function call: "
                     + fName.Value + " " + next.simpleRepresentation());
             }
         }
@@ -449,6 +482,7 @@ namespace OMathParser.Syntax
                             Lexeme funcName = stackTop as Lexeme;
                             output.Enqueue(funcName);
                             operatorStack.Pop();
+                            openedArgumentLists--;
                         }
                     }
                     catch (InvalidOperationException ex)
@@ -461,6 +495,45 @@ namespace OMathParser.Syntax
                 else
                 {
                     output.Enqueue(popped);
+                }
+            }
+        }
+
+        protected void processArgumentSeparator()
+        {
+            if (openedArgumentLists < 1)
+            {
+                throw new ParseException("Unexpected function argument separator (',') found.");
+            }
+            else
+            {
+                while (true)
+                {
+                    Lexeme popped;
+                    try
+                    {
+                        popped = operatorStack.Pop();
+                    }
+                    catch (InvalidOperationException ex)
+                    {
+                        throw new ParseException("Unexpected function argument separator (',') found.");
+                    }
+
+                    if (popped.Type == Lexeme.LexemeType.LEFT_PAREN)
+                    {
+                        if (operatorStack.Peek().Type != Lexeme.LexemeType.FUNCTION_NAME)
+                        {
+                            throw new ParseException("Unexpected function argument separator (',') found.");
+                        }
+                        else
+                        {
+                            return;
+                        }
+                    }
+                    else
+                    {
+                        output.Enqueue(popped);
+                    }
                 }
             }
         }
