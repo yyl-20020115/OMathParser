@@ -8,7 +8,7 @@ using OMathParser.Syntax.Nodes.Abstract;
 
 namespace OMathParser.Syntax.Nodes
 {
-    class UnaryMinusNode : UnaryNode
+    public class UnaryMinusNode : UnaryNode
     {
         public UnaryMinusNode(SyntaxNode child) : base(child)
         {

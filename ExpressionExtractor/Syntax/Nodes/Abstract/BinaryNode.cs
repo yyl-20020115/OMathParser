@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace OMathParser.Syntax.Nodes.Abstract
 {
-    abstract class BinaryNode : SyntaxNode
+    public abstract class BinaryNode : SyntaxNode
     {
         protected SyntaxNode left;
         protected SyntaxNode right;

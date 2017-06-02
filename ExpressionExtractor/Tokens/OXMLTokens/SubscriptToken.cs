@@ -8,7 +8,7 @@ using OMathParser.Tokens.OXMLTokens.Abstract;
 
 namespace OMathParser.Tokens.OXMLTokens
 {
-    class SubscriptToken : AbstractToken
+    public class SubscriptToken : AbstractToken
     {
         private TokenList subBase;
         private TokenList subArgument;

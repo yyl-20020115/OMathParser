@@ -8,7 +8,7 @@ using OMathParser.Tokens.OXMLTokens.Abstract;
 
 namespace OMathParser.Tokens.OXMLTokens
 {
-    class FractionToken : AbstractToken
+    public class FractionToken : AbstractToken
     {
         private TokenList numerator;
         private TokenList denominator;

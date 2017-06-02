@@ -8,7 +8,7 @@ using OMathParser.Tokens.OXMLTokens.Abstract;
 
 namespace OMathParser.Tokens.OXMLTokens
 {
-    class RadicalToken : AbstractToken
+    public class RadicalToken : AbstractToken
     {
         private TokenList radBase;
         private TokenList degree;

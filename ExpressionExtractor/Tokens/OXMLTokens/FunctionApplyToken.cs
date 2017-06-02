@@ -8,7 +8,7 @@ using OMathParser.Tokens.OXMLTokens.Abstract;
 
 namespace OMathParser.Tokens.OXMLTokens
 {
-    class FunctionApplyToken : AbstractToken
+    public class FunctionApplyToken : AbstractToken
     {
         private TokenList funcBase;
         private TokenList funcName;

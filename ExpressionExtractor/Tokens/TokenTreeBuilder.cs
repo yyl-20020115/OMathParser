@@ -18,15 +18,11 @@ namespace OMathParser.Tokens
     class TokenTreeBuilder
     {
         private ParseProperties parseProperties;
-        private char[] specialCharacters;
-        private String[] identifiers;
         private IDictionary<String, int> functions;
 
         public TokenTreeBuilder(ParseProperties parseProperties)
         {
             this.parseProperties = parseProperties;
-            specialCharacters = parseProperties.SpecialChars.ToArray();
-            identifiers = parseProperties.Identifiers.ToArray();
 
             functions = new Dictionary<String, int>();
             foreach (KeyValuePair<String, int> funcDeclaration in parseProperties.Functions)
@@ -223,41 +219,5 @@ namespace OMathParser.Tokens
 
             return new FunctionApplyToken(funcBase, funcName);
         }
-
-        //private TokenList mergeTextRunTokens(TokenList tokens)
-        //{
-        //    TokenList consecutiveTextRuns = new TokenList();
-        //    TokenList processed = new TokenList();
-
-
-        //    int i = 0;
-        //    while (i < tokens.Count)
-        //    {
-        //        if (tokens[i] is TextRunToken)
-        //        {
-        //            consecutiveTextRuns.addToken(tokens[i]);
-        //        }
-        //        else
-        //        {
-        //            if (consecutiveTextRuns.Count != 0)
-        //            {
-        //                StringBuilder textRun = new StringBuilder();
-        //                foreach (var text in consecutiveTextRuns)
-        //                {
-        //                    textRun.Append((text as TextRunToken).Text);
-        //                }
-        //                processed.addToken(new TextRunToken(textRun.ToString()));
-        //                consecutiveTextRuns.Clear();
-        //            }
-
-        //            processed.Add(tokens[i]);
-        //        }
-
-        //        i++;
-        //    }
-
-        //    processed.Parent = tokens.Parent;
-        //    return processed;
-        //}
     }
 }

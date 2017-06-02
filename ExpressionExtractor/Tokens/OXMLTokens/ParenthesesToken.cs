@@ -8,7 +8,7 @@ using OMathParser.Tokens.OXMLTokens.Abstract;
 
 namespace OMathParser.Tokens.OXMLTokens
 {
-    class ParenthesesToken : AbstractToken
+    public class ParenthesesToken : AbstractToken
     {
         private TokenList elements;
         private char beginChar;

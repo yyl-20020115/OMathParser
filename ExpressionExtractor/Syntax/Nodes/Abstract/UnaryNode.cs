@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace OMathParser.Syntax.Nodes.Abstract
 {
-    abstract class UnaryNode : SyntaxNode
+    public abstract class UnaryNode : SyntaxNode
     {
         protected SyntaxNode child;
 

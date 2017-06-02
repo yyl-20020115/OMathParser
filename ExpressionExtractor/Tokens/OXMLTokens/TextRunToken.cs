@@ -8,7 +8,7 @@ using OMathParser.Tokens.OXMLTokens.Abstract;
 
 namespace OMathParser.Tokens.OXMLTokens
 {
-    class TextRunToken : AbstractToken
+    public class TextRunToken : AbstractToken
     {
         private String text;
 

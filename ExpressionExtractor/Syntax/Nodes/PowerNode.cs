@@ -8,7 +8,7 @@ using OMathParser.Syntax.Nodes.Abstract;
 
 namespace OMathParser.Syntax.Nodes
 {
-    class PowerNode : BinaryNode
+    public class PowerNode : BinaryNode
     {
         public PowerNode(SyntaxNode exponentBase, SyntaxNode power) 
             : base(left : exponentBase, right : power)

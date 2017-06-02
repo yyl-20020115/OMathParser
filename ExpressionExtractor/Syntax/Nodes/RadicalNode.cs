@@ -8,7 +8,7 @@ using OMathParser.Syntax.Nodes.Abstract;
 
 namespace OMathParser.Syntax.Nodes
 {
-    class RadicalNode : BinaryNode
+    public class RadicalNode : BinaryNode
     {
         public RadicalNode(SyntaxNode radicalBase, SyntaxNode degree) 
             : base(left : radicalBase, right : degree)

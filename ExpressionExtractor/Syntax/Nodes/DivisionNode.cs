@@ -8,7 +8,7 @@ using OMathParser.Syntax.Nodes.Abstract;
 
 namespace OMathParser.Syntax.Nodes
 {
-    class DivisionNode : BinaryNode
+    public class DivisionNode : BinaryNode
     {
         public DivisionNode(SyntaxNode left, SyntaxNode right) : base(left, right)
         {

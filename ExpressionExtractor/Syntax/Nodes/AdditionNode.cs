@@ -8,7 +8,7 @@ using OMathParser.Syntax.Nodes.Abstract;
 
 namespace OMathParser.Syntax.Nodes
 {
-    class AdditionNode : BinaryNode
+    public class AdditionNode : BinaryNode
     {
         public AdditionNode(SyntaxNode left, SyntaxNode right) : base(left, right)
         {

@@ -8,7 +8,7 @@ using OMathParser.Syntax.Nodes.Abstract;
 
 namespace OMathParser.Syntax.Nodes
 {
-    class ConstantIdentifierNode : SyntaxNode
+    public class ConstantIdentifierNode : SyntaxNode
     {
         private String name;
         private double value;
