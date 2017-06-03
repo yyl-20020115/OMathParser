@@ -54,7 +54,7 @@ namespace OMathParser.Syntax
                 }
                 catch (InvalidOperationException ex)
                 {
-                    if (operatorStack.Count > 0)
+                    if (outputCount() > 0)
                     {
                         constructSingleArgument();
                     }
