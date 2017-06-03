@@ -122,6 +122,7 @@ namespace OMathParser.Syntax
                     }
                     else
                     {
+                        //Lexeme.LexemeType.EQ_SIGN not allow inside argument list
                         throw new ParseException("Unknown token type encountered in input.");
                     }
                 }

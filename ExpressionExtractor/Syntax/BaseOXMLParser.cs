@@ -349,14 +349,17 @@ namespace OMathParser.Syntax
 
         protected ArgumentListNode parseArgumentList(TokenList argumentList, int argumentsNeeded)
         {
-            ArgumentTokenListParser argumentListParser = new ArgumentTokenListParser(properties, argumentList, argumentsNeeded);
+            ArgumentTokenListParser argumentListParser = 
+                new ArgumentTokenListParser(properties, argumentList, argumentsNeeded);
             return argumentListParser.Parse();
         }
 
         protected ArgumentListNode parseArgumentList(ParenthesesToken argumentList, int argumentsNeeded)
         {
-            // TODO:
-            throw new NotImplementedException();
+            List<SyntaxNode> processedArguments = new List<SyntaxNode>();
+            ArgumentTokenListParser argumentListParser =
+                new ArgumentTokenListParser(properties, argumentList.Elements, argumentsNeeded);
+            return argumentListParser.Parse();
         }
 
         protected ArgumentListNode parseArgumentList(DelimiterToken argumentList)
@@ -384,7 +387,7 @@ namespace OMathParser.Syntax
             if (next is ParenthesesToken)
             {
                 int nArguments = properties.getFunctionArgumentsCount(fName.Value);
-                ArgumentListNode arguments = parseArgumentList(next as ParenthesesToken);
+                ArgumentListNode arguments = parseArgumentList(next as ParenthesesToken, nArguments);
 
                 if (arguments.Count != nArguments)
                 {
