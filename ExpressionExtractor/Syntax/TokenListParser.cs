@@ -22,25 +22,6 @@ namespace OMathParser.Syntax
             populateInputQueue(tokens);
         }
 
-        private void populateInputQueue(TokenList tokens)
-        {
-            foreach (IToken t in tokens)
-            {
-                if (t is TextRunToken)
-                {
-                    String run = (t as TextRunToken).Text;
-                    foreach (IToken lexeme in textRunTokenizer.Tokenize(run))
-                    {
-                        addToInputQueue(lexeme);
-                    }
-                }
-                else
-                {
-                    addToInputQueue(t);
-                }
-            }
-        }
-
         private List<ISyntaxUnit> convertToPostfix()
         {
             while (true)

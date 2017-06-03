@@ -25,7 +25,7 @@ namespace OMathParser.Syntax
 
         private IToken currentInput;
         private IToken previousInput;
-        private int openedArgumentLists;
+        protected int openedArgumentLists;
 
         public BaseOXMLParser(ParseProperties properties)
         {
@@ -41,21 +41,52 @@ namespace OMathParser.Syntax
             this.openedArgumentLists = 0;
         }
 
-        protected void addToInputQueue(IToken token)
+        protected void populateInputQueue(TokenList tokens)
         {
-            this.input.Enqueue(token);
+            foreach (IToken t in tokens)
+            {
+                if (t is TextRunToken)
+                {
+                    String run = (t as TextRunToken).Text;
+                    foreach (IToken lexeme in textRunTokenizer.Tokenize(run))
+                    {
+                        input.Enqueue(lexeme);
+                    }
+                }
+                else
+                {
+                    input.Enqueue(t);
+                }
+            }
         }
 
         protected IToken peekNextInput()
         {
             return input.Peek();
         }
-
+        
         protected IToken pollNextInput()
         {
             previousInput = currentInput;
             currentInput = input.Dequeue();
             return currentInput;
+        }
+
+        protected int inputCount()
+        {
+            return input.Count;
+        }
+
+        protected int outputCount()
+        {
+            return output.Count;
+        }
+
+        protected List<ISyntaxUnit> clearOutput()
+        {
+            List<ISyntaxUnit> outputCopy = this.output.ToList();
+            this.output.Clear();
+            return outputCopy;
         }
 
         protected void pushOperator(Lexeme op)
@@ -182,10 +213,13 @@ namespace OMathParser.Syntax
                         type == Lexeme.LexemeType.OP_DIV ||
                         type == Lexeme.LexemeType.OP_MUL ||
                         type == Lexeme.LexemeType.OP_MINUS ||
-                        type == Lexeme.LexemeType.OP_PLUS;
+                        type == Lexeme.LexemeType.OP_PLUS ||
+                        type == Lexeme.LexemeType.ARGUMENT_SEPARATOR;
             }
-
-            return false;
+            else
+            {
+                return false;
+            }
         }
 
         protected SyntaxNode processValueProducerLexeme(Lexeme lexeme)
@@ -236,7 +270,7 @@ namespace OMathParser.Syntax
                     if (properties.isFunctionNameDeclared(functionName))
                     {
                         int nArguments = properties.getFunctionArgumentsCount(functionName);
-                        ArgumentListNode arguments = parseArgumentList(func.Arguments);
+                        ArgumentListNode arguments = parseArgumentList(func.Arguments, nArguments);
 
                         if (arguments.Count != nArguments)
                         {
@@ -258,8 +292,8 @@ namespace OMathParser.Syntax
                         String functionName = (sup.Base[0] as TextRunToken).Text;
                         if (properties.isFunctionNameDeclared(functionName))
                         {
-                            int? nArguments = properties.getFunctionArgumentsCount(functionName);
-                            ArgumentListNode arguments = parseArgumentList(func.Arguments);
+                            int nArguments = properties.getFunctionArgumentsCount(functionName);
+                            ArgumentListNode arguments = parseArgumentList(func.Arguments, nArguments);
 
                             if (arguments.Count != nArguments)
                             {
@@ -313,13 +347,13 @@ namespace OMathParser.Syntax
 
 
 
-        protected ArgumentListNode parseArgumentList(TokenList argumentList)
+        protected ArgumentListNode parseArgumentList(TokenList argumentList, int argumentsNeeded)
         {
-            // TODO:
-            throw new NotImplementedException();
+            ArgumentTokenListParser argumentListParser = new ArgumentTokenListParser(properties, argumentList, argumentsNeeded);
+            return argumentListParser.Parse();
         }
 
-        protected ArgumentListNode parseArgumentList(ParenthesesToken argumentList)
+        protected ArgumentListNode parseArgumentList(ParenthesesToken argumentList, int argumentsNeeded)
         {
             // TODO:
             throw new NotImplementedException();
