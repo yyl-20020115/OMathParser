@@ -24,8 +24,9 @@ namespace OMathParser.Syntax
         protected Queue<ISyntaxUnit> output;
         protected Stack<Lexeme> operatorStack;
 
-        protected IToken lastProcessedInput;
-        protected int openedArgumentLists;
+        private IToken currentInput;
+        private IToken previousInput;
+        private int openedArgumentLists;
 
         public BaseOXMLParser(ParseProperties properties)
         {
@@ -37,7 +38,8 @@ namespace OMathParser.Syntax
             this.output = new Queue<ISyntaxUnit>();
             this.operatorStack = new Stack<Lexeme>();
 
-            this.lastProcessedInput = null;
+            this.currentInput = null;
+            this.previousInput = null;
             this.openedArgumentLists = 0;
         }
 
@@ -48,9 +50,9 @@ namespace OMathParser.Syntax
 
         protected IToken pollNextInput()
         {
-            IToken next = input.Dequeue();
-            lastProcessedInput = next;
-            return next;
+            previousInput = currentInput;
+            currentInput = input.Dequeue();
+            return currentInput;
         }
 
         protected void pushOperator(Lexeme op)
@@ -164,13 +166,13 @@ namespace OMathParser.Syntax
 
         protected bool canProcessTokenAsUnaryOp()
         {
-            if (lastProcessedInput == null)
+            if (previousInput == null)
             {
                 return true;
             }
-            else if (lastProcessedInput is Lexeme)
+            else if (previousInput is Lexeme)
             {
-                Lexeme previous = lastProcessedInput as Lexeme;
+                Lexeme previous = previousInput as Lexeme;
                 Lexeme.LexemeType type = previous.Type;
                 return type == Lexeme.LexemeType.LEFT_PAREN ||
                         type == Lexeme.LexemeType.EQ_SIGN ||

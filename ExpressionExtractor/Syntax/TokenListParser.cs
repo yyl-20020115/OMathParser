@@ -43,7 +43,17 @@ namespace OMathParser.Syntax
 
         public SyntaxNode parse()
         {
-            IToken current = pollNextInput();
+            IToken current;
+            try
+            {
+                current = pollNextInput();
+            }
+            catch (InvalidOperationException ex)
+            {
+                // TODO: implementiraj kraj
+                return null;
+            }
+
             if (canProduceValue(current))
             {
                 // LexemeTypes: REAL_VALUE, IDENTIFIER_CONST and IDENTIFIER_VAR are processed here
