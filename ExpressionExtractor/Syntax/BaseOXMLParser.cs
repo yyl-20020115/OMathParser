@@ -496,8 +496,189 @@ namespace OMathParser.Syntax
 
         protected SyntaxNode buildSyntaxTree(List<ISyntaxUnit> postfixForm)
         {
-            // TODO: implement this!!
-            return null;
+            Queue<ISyntaxUnit> inputQueue = new Queue<ISyntaxUnit>(postfixForm);
+            Stack<SyntaxNode> operandStack = new Stack<SyntaxNode>();
+            while (inputQueue.Count > 0)
+            {
+                ISyntaxUnit input = inputQueue.Dequeue();
+                if (input is Lexeme)
+                {
+                    Lexeme token = input as Lexeme;
+                    Lexeme.LexemeType ttype = token.Type;
+                    if (ttype == Lexeme.LexemeType.IDENTIFIER_VAR)
+                    {
+                        VariableIdentifierNode variable = new VariableIdentifierNode(token.Value);
+                        operandStack.Push(variable);
+                    }
+                    else if (ttype == Lexeme.LexemeType.IDENTIFIER_CONST)
+                    {
+                        double constantValue = properties.getConstantValue(token.Value);
+                        ConstantIdentifierNode constant = new ConstantIdentifierNode(token.Value, constantValue);
+                        operandStack.Push(constant);
+                    }
+                    else if (ttype == Lexeme.LexemeType.FUNCTION_NAME)
+                    {
+                        int nArguments = properties.getFunctionArgumentsCount(token.Value);
+                        FunctionApplyNode.FunctionBody funcBody = properties.getFunctionDefinition(token.Value);
+                        ArgumentListNode argumentList = new ArgumentListNode();
+                        try
+                        {
+                            for (int i = 0; i < nArguments; i++)
+                            {
+                                argumentList.addArgument(operandStack.Pop());
+                            }
+                        }
+                        catch (InvalidOperationException ex)
+                        {
+                            throw new ParseException("Not enough operands on operand stack for function call.");
+                        }
+
+                        FunctionApplyNode functionCall = new FunctionApplyNode(argumentList, funcBody, token.Value);
+                        operandStack.Push(functionCall);
+                    }
+                    else if (ttype == Lexeme.LexemeType.REAL_VALUE)
+                    {
+                        double value;
+                        if (!double.TryParse(token.Value, NumberStyles.Any, CultureInfo.InvariantCulture, out value))
+                        {
+                            throw new ParseException("Couldn't parse literal value: " + token.Value);
+                        }
+                        LiteralNode literal = new LiteralNode(value);
+                        operandStack.Push(literal);
+                    }
+                    else if (ttype == Lexeme.LexemeType.OP_PLUS)
+                    {
+                        try
+                        {
+                            SyntaxNode right = operandStack.Pop();
+                            SyntaxNode left = operandStack.Pop();
+                            AdditionNode addition = new AdditionNode(left, right);
+                            operandStack.Push(addition);
+                        }
+                        catch (InvalidOperationException ex)
+                        {
+                            throw new ParseException("Missing operand(s) for addition.");
+                        }
+                    }
+                    else if (ttype == Lexeme.LexemeType.OP_MINUS)
+                    {
+                        try
+                        {
+                            SyntaxNode right = operandStack.Pop();
+                            SyntaxNode left = operandStack.Pop();
+                            SubtractionNode subtraction = new SubtractionNode(left, right);
+                            operandStack.Push(subtraction);
+                        }
+                        catch (InvalidOperationException ex)
+                        {
+                            throw new ParseException("Missing operand(s) for subtraction.");
+                        }
+                    }
+                    else if (ttype == Lexeme.LexemeType.OP_MUL)
+                    {
+                        try
+                        {
+                            SyntaxNode right = operandStack.Pop();
+                            SyntaxNode left = operandStack.Pop();
+                            MultiplicationNode multiplication = new MultiplicationNode(left, right);
+                            operandStack.Push(multiplication);
+                        }
+                        catch (InvalidOperationException ex)
+                        {
+                            throw new ParseException("Missing operand(s) for multiplication.");
+                        }
+                    }
+                    else if (ttype == Lexeme.LexemeType.OP_DIV)
+                    {
+                        try
+                        {
+                            SyntaxNode right = operandStack.Pop();
+                            SyntaxNode left = operandStack.Pop();
+                            DivisionNode division = new DivisionNode(left, right);
+                            operandStack.Push(division);
+                        }
+                        catch (InvalidOperationException ex)
+                        {
+                            throw new ParseException("Missing operand(s) for division.");
+                        }
+                    }
+                    else if (ttype == Lexeme.LexemeType.OP_POW)
+                    {
+                        try
+                        {
+                            SyntaxNode exponent = operandStack.Pop();
+                            SyntaxNode baseNode = operandStack.Pop();
+                            PowerNode power = new PowerNode(baseNode, exponent);
+                            operandStack.Push(power);
+                        }
+                        catch (InvalidOperationException ex)
+                        {
+                            throw new ParseException("Missing operand(s) for exponentiation.");
+                        }
+                    }
+                    else if (ttype == Lexeme.LexemeType.EQ_SIGN)
+                    {
+                        try
+                        {
+                            SyntaxNode right = operandStack.Pop();
+                            SyntaxNode left = operandStack.Pop();
+                            EqualsNode eqNode = new EqualsNode(left, right);
+                            operandStack.Push(eqNode);
+                        }
+                        catch (InvalidOperationException ex)
+                        {
+                            throw new ParseException("Missing operand(s) for assignment.");
+                        }
+                    }
+                    else if (ttype == Lexeme.LexemeType.OP_PLUS_UNARY)
+                    {
+                        try
+                        {
+                            SyntaxNode child = operandStack.Pop();
+                            UnaryPlusNode unaryPlus = new UnaryPlusNode(child);
+                            operandStack.Push(unaryPlus);
+                        }
+                        catch (InvalidOperationException ex)
+                        {
+                            throw new ParseException("Missing operand for unary plus.");
+                        }
+                    }
+                    else if (ttype == Lexeme.LexemeType.OP_MINUS_UNARY)
+                    {
+                        try
+                        {
+                            SyntaxNode child = operandStack.Pop();
+                            UnaryMinusNode unaryMinus = new UnaryMinusNode(child);
+                            operandStack.Push(unaryMinus);
+                        }
+                        catch (InvalidOperationException ex)
+                        {
+                            throw new ParseException("Missing operand for unary minus.");
+                        }
+                    }
+                    else
+                    {
+                        throw new ParseException("Unexpected token in postfix expression: " + token.simpleRepresentation());
+                    }
+                }
+                else if (input is SyntaxNode)
+                {
+                    operandStack.Push(input as SyntaxNode);
+                }
+                else
+                {
+                    throw new ParseException("Unexpected object type in postfix expression.");
+                }
+            }
+
+            if (operandStack.Count == 1)
+            {
+                return operandStack.Pop();
+            }
+            else
+            {
+                throw new ParseException("Too many operands in postfix expression.");
+            }
         }
     }
 }

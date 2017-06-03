@@ -51,6 +51,7 @@
     <Compile Include="Syntax\Nodes\Abstract\ISyntaxUnit.cs" />
     <Compile Include="Syntax\Nodes\ArgumentListNode.cs" />
     <Compile Include="Syntax\Nodes\ConstantIdentifierNode.cs" />
+    <Compile Include="Syntax\Nodes\EqualsNode.cs" />
     <Compile Include="Syntax\Nodes\LiteralNode.cs" />
     <Compile Include="Syntax\Nodes\UnaryPlusNode.cs" />
     <Compile Include="Syntax\Nodes\VariableIdentifierNode.cs" />
