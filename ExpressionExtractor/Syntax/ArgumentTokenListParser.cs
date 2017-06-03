@@ -8,9 +8,10 @@ using OMathParser.Tokens.OXMLTokens;
 
 namespace OMathParser.Syntax
 {
-    class ArgumentListParser : BaseOXMLParser
+    class ArgumentTokenListParser : BaseOXMLParser
     {
-        public ArgumentListParser(ParseProperties properties, TokenList arguments) : base(properties)
+        public ArgumentTokenListParser(ParseProperties properties, TokenList arguments) 
+            : base(properties)
         {
             this.openedArgumentLists = 1;
         }

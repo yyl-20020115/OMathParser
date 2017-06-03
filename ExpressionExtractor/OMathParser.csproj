@@ -46,7 +46,8 @@
     <Compile Include="Lexical\Tokenizer.cs" />
     <Compile Include="OMathParser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Syntax\ArgumentListParser.cs" />
+    <Compile Include="Syntax\ArgumentParenthesesParser.cs" />
+    <Compile Include="Syntax\ArgumentTokenListParser.cs" />
     <Compile Include="Syntax\BaseOXMLParser.cs" />
     <Compile Include="Syntax\Nodes\Abstract\ISyntaxUnit.cs" />
     <Compile Include="Syntax\Nodes\ArgumentListNode.cs" />
