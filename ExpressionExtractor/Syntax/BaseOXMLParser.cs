@@ -19,8 +19,7 @@ namespace OMathParser.Syntax
         protected ParseProperties properties;
         protected Tokenizer textRunTokenizer;
 
-        protected Queue<IToken> input;
-        protected List<IToken> processed;
+        private Queue<IToken> input;
         protected Queue<ISyntaxUnit> output;
         protected Stack<Lexeme> operatorStack;
 
@@ -34,13 +33,17 @@ namespace OMathParser.Syntax
             this.textRunTokenizer = new Tokenizer(properties);
 
             this.input = new Queue<IToken>();
-            this.processed = new List<IToken>();
             this.output = new Queue<ISyntaxUnit>();
             this.operatorStack = new Stack<Lexeme>();
 
             this.currentInput = null;
             this.previousInput = null;
             this.openedArgumentLists = 0;
+        }
+
+        protected void addToInputQueue(IToken token)
+        {
+            this.input.Enqueue(token);
         }
 
         protected IToken peekNextInput()
@@ -452,6 +455,12 @@ namespace OMathParser.Syntax
                     }
                 }
             }
+        }
+
+        protected SyntaxNode buildSyntaxTree(List<ISyntaxUnit> postfixForm)
+        {
+            // TODO: implement this!!
+            return null;
         }
     }
 }
