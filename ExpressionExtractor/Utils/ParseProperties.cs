@@ -21,6 +21,7 @@ namespace OMathParser.Utils
             identifiers = new HashSet<String>();
             constants = new Dictionary<String, double>();
             functionDeclarations = new Dictionary<String, int>();
+            functionDefinitions = new Dictionary<String, FunctionApplyNode.FunctionBody>();
             specialCharacters = new HashSet<Char>();
 
             populateConstants();
@@ -89,6 +90,16 @@ namespace OMathParser.Utils
                 throw new ParseException("No constant declaration found for constant name: " + name);
             }
             
+        }
+
+        public bool isConstantIdentifierDeclared(String name)
+        {
+            return constants.ContainsKey(name);
+        }
+
+        public bool isVariableIdentifierDeclared(String name)
+        {
+            return identifiers.Contains(name);
         }
 
         public bool isFunctionNameDeclared(String name)

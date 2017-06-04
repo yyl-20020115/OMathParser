@@ -15,7 +15,7 @@ using OMathParser.Utils;
 
 namespace OMathParser.Tokens
 {
-    class TokenTreeBuilder
+    public class TokenTreeBuilder
     {
         private ParseProperties parseProperties;
         private IDictionary<String, int> functions;

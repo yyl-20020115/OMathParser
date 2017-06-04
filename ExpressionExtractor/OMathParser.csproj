@@ -43,8 +43,8 @@
   <ItemGroup>
     <Compile Include="Expression.cs" />
     <Compile Include="Lexical\Lexeme.cs" />
+    <Compile Include="Lexical\NumericLiteralMatcher.cs" />
     <Compile Include="Lexical\Tokenizer.cs" />
-    <Compile Include="OMathParser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Syntax\ArgumentTokenListParser.cs" />
     <Compile Include="Syntax\BaseOXMLParser.cs" />

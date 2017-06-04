@@ -8,7 +8,7 @@ using OMathParser.Syntax.Nodes.Abstract;
 
 namespace OMathParser.Syntax
 {
-    class SyntaxTree
+    public class SyntaxTree
     {
         private SyntaxNode root;
 

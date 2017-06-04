@@ -24,7 +24,7 @@ namespace OMathParser.Syntax
         protected Stack<Lexeme> operatorStack;
 
         private IToken currentInput;
-        private IToken previousInput;
+        private IToken previousInput;   // TODO: ne radi kak spada, previousInput nikad nebude Lexeme, promijeni kak se previousInput postavlja!!
         protected int openedArgumentLists;
 
         public BaseOXMLParser(ParseProperties properties)
@@ -344,8 +344,6 @@ namespace OMathParser.Syntax
 
             return new RadicalNode(baseNode, degreeNode);
         }
-
-
 
         protected ArgumentListNode parseArgumentList(TokenList argumentList, int argumentsNeeded)
         {

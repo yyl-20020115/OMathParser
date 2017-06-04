@@ -4,12 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using OMathParser.Syntax.Nodes.Abstract;
 using OMathParser.Tokens;
 using OMathParser.Utils;
 
 namespace OMathParser.Syntax
 {
-    class SyntaxTreeBuilder
+    public class SyntaxTreeBuilder
     {
         private ParseProperties parseProperties;
 
@@ -20,9 +21,9 @@ namespace OMathParser.Syntax
 
         public SyntaxTree Build(TokenTree tokenTree)
         {
-            return null;
+            TokenListParser parser = new TokenListParser(parseProperties, tokenTree.RootTokens);
+            SyntaxNode root = parser.parse();
+            return new SyntaxTree(root);
         }
-
-
     }
 }

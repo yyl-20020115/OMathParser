@@ -12,10 +12,12 @@ namespace OMathParser.Lexical
     public class Tokenizer
     {
         private ParseProperties properties;
+        private NumericLiteralMatcher literalMatcher;
 
         public Tokenizer(ParseProperties properties)
         {
             this.properties = properties;
+            this.literalMatcher = new NumericLiteralMatcher(properties);
         }
 
         public List<Lexeme> Tokenize(String run)
@@ -182,12 +184,10 @@ namespace OMathParser.Lexical
 
         private Lexeme matchNumericLiteral(string input, int startPos)
         {
-            String pattern = @"\A[-+]?(0?|[1-9][0-9]*)(\.[0-9]*[1-9])?([eE][-+]?(0|[1-9][0-9]*))?";
-            String inputSubstring = input.Substring(startPos, input.Length - startPos);
-            Match m = Regex.Match(inputSubstring, pattern);
-            if (m.Success && !String.IsNullOrEmpty(m.Value))
+            String match;
+            if (literalMatcher.tryMatch(input, startPos, out match))
             {
-                return new Lexeme(Lexeme.LexemeType.REAL_VALUE, m.Value);
+                return new Lexeme(Lexeme.LexemeType.REAL_VALUE, match);
             }
             else
             {
