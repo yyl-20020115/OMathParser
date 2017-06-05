@@ -27,19 +27,27 @@ namespace OMathParser.Syntax
             while (true)
             {
                 IToken current;
-                try
-                {
-                    current = pollNextInput();
-                }
-                catch (InvalidOperationException ex)
-                {
-                    while (operatorStack.Count > 0)
-                    {
-                        Lexeme op = operatorStack.Pop();
-                        output.Enqueue(op);
-                    }
 
-                    return new List<ISyntaxUnit>(output);
+                if (canAddImplicitMultiplication())
+                {
+                    current = new Lexeme(Lexeme.LexemeType.OP_MUL, "*");
+                }
+                else
+                {
+                    try
+                    {
+                        current = pollNextInput();
+                    }
+                    catch (InvalidOperationException ex)
+                    {
+                        while (operatorStack.Count > 0)
+                        {
+                            Lexeme op = operatorStack.Pop();
+                            output.Enqueue(op);
+                        }
+
+                        return new List<ISyntaxUnit>(output);
+                    }
                 }
 
                 if (canProduceValue(current))
