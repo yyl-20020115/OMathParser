@@ -129,7 +129,7 @@ namespace OMathParser.Syntax
             }
         }
 
-        protected new void processArgumentSeparator()
+        protected void processArgumentSeparator()
         {
             if (openedArgumentLists == 0)
             {
