@@ -21,6 +21,7 @@ namespace OMathParser.Syntax
         public ArgumentTokenListParser(ParseProperties properties, TokenList arguments, int nArguments) 
             : base(properties)
         {
+            this.processedArguments = new List<SyntaxNode>();
             this.argumentsNeeded = nArguments;
             populateInputQueue(arguments);
         }
