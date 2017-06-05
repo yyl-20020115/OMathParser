@@ -99,6 +99,11 @@ namespace OMathParser.Lexical
             return this.precedence > other.precedence;
         }
 
+        public bool IsEqualPrecedence(Lexeme other)
+        {
+            return this.precedence == other.precedence;
+        }
+
         public bool IsLowerPrecedence(Lexeme other)
         {
             return this.precedence < other.precedence;

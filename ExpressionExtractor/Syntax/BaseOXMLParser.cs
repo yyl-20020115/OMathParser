@@ -113,7 +113,7 @@ namespace OMathParser.Syntax
                 try
                 {
                     Lexeme top = operatorStack.Peek();
-                    while (top.Type != Lexeme.LexemeType.LEFT_PAREN && !top.IsHigherPrecedence(op))
+                    while (top.Type != Lexeme.LexemeType.LEFT_PAREN || top.IsHigherPrecedence(op))
                     {
                         // pop the top of the stack into the output queue as long as it isn't 
                         // an opening parenthesis or its precedence is lower or equal to that of
@@ -136,7 +136,9 @@ namespace OMathParser.Syntax
                 try
                 {
                     Lexeme top = operatorStack.Peek();
-                    while (top.Type != Lexeme.LexemeType.LEFT_PAREN && top.IsLowerPrecedence(op))
+                    while (top.Type != Lexeme.LexemeType.LEFT_PAREN 
+                            || top.IsHigherPrecedence(op) 
+                            || top.IsEqualPrecedence(op))
                     {
                         // pop the top of the stack into the output queue as long as it isn't 
                         // an opening parenthesis or its precedence is lower to that of
@@ -308,7 +310,7 @@ namespace OMathParser.Syntax
             TokenListParser denominatorParser = new TokenListParser(properties, fraction.Denominator);
 
             SyntaxNode left = numeratorParser.parse();
-            SyntaxNode right = numeratorParser.parse();
+            SyntaxNode right = denominatorParser.parse();
 
             return new DivisionNode(left, right);
         }
