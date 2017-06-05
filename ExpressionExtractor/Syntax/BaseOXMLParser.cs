@@ -23,8 +23,9 @@ namespace OMathParser.Syntax
         protected Queue<ISyntaxUnit> output;
         protected Stack<Lexeme> operatorStack;
 
-        private IToken currentInput;
-        private IToken previousInput;   // TODO: ne radi kak spada, previousInput nikad nebude Lexeme, promijeni kak se previousInput postavlja!!
+        //private IToken currentInput;
+        //private IToken previousInput;   // TODO: ne radi kak spada, previousInput nikad nebude Lexeme, promijeni kak se previousInput postavlja!!
+        protected ISyntaxUnit lastProcessedElement;
         protected int openedArgumentLists;
 
         public BaseOXMLParser(ParseProperties properties)
@@ -36,8 +37,9 @@ namespace OMathParser.Syntax
             this.output = new Queue<ISyntaxUnit>();
             this.operatorStack = new Stack<Lexeme>();
 
-            this.currentInput = null;
-            this.previousInput = null;
+            //this.currentInput = null;
+            //this.previousInput = null;
+            this.lastProcessedElement = null;
             this.openedArgumentLists = 0;
         }
 
@@ -62,14 +64,23 @@ namespace OMathParser.Syntax
 
         protected IToken peekNextInput()
         {
-            return input.Peek();
+            try
+            {
+                return input.Peek();
+            }
+            catch (InvalidOperationException ex)
+            {
+                return null;
+            }
+            
         }
         
         protected IToken pollNextInput()
         {
-            previousInput = currentInput;
-            currentInput = input.Dequeue();
-            return currentInput;
+            //previousInput = currentInput;
+            //currentInput = input.Dequeue();
+            //return currentInput;
+            return input.Dequeue();
         }
 
         protected int inputCount()
@@ -116,6 +127,7 @@ namespace OMathParser.Syntax
                     // operator stack is empty, continue with pushing operator
                 }
 
+                lastProcessedElement = op;
                 operatorStack.Push(op);
             }
             else
@@ -138,44 +150,57 @@ namespace OMathParser.Syntax
                     // operator stack is empty, continue with pushing operator
                 }
 
+                lastProcessedElement = op;
                 operatorStack.Push(op);
             }
         }
 
         protected void pushValueProducerToOutput(IToken t)
         {
+            ISyntaxUnit processed;
             if (t is Lexeme)
             {
-                output.Enqueue(processValueProducerLexeme(t as Lexeme));
+                processed = processValueProducerLexeme(t as Lexeme);
             }
             else
             {
                 if (t is FractionToken)
                 {
-                    output.Enqueue(processFraction(t as FractionToken));
+                    processed = processFraction(t as FractionToken);
                 }
                 else if (t is FunctionApplyToken)
                 {
-                    output.Enqueue(processFuncApplyToken(t as FunctionApplyToken));
+                    processed = processFuncApplyToken(t as FunctionApplyToken);
                 }
                 else if (t is ParenthesesToken)
                 {
-                    output.Enqueue(processParenthesesToken(t as ParenthesesToken));
+                    processed = processParenthesesToken(t as ParenthesesToken);
                 }
                 else if (t is SuperscriptToken)
                 {
-                    output.Enqueue(processSuperscriptToken(t as SuperscriptToken));
+                    processed = processSuperscriptToken(t as SuperscriptToken);
                 }
                 else if (t is RadicalToken)
                 {
-                    output.Enqueue(processRadicalToken(t as RadicalToken));
+                    processed = processRadicalToken(t as RadicalToken);
+                }
+                else
+                {
+                    throw new ParseException("Given token cannot be pushed into the output queue as a value producer.");
                 }
             }
+
+            output.Enqueue(processed);
+            lastProcessedElement = processed;
         }
 
-        protected bool canProduceValue(IToken token)
+        protected bool canProduceValue(Object token)
         {
-            if (token is Lexeme)
+            if (token is SyntaxNode)
+            {
+                return true;
+            }
+            else if (token is Lexeme)
             {
                 Lexeme l = token as Lexeme;
                 Lexeme.LexemeType t = l.Type;
@@ -198,15 +223,39 @@ namespace OMathParser.Syntax
             return false;
         }
 
+        //protected bool canProcessTokenAsUnaryOp()
+        //{
+        //    if (previousInput == null)
+        //    {
+        //        return true;
+        //    }
+        //    else if (previousInput is Lexeme)
+        //    {
+        //        Lexeme previous = previousInput as Lexeme;
+        //        Lexeme.LexemeType type = previous.Type;
+        //        return type == Lexeme.LexemeType.LEFT_PAREN ||
+        //                type == Lexeme.LexemeType.EQ_SIGN ||
+        //                type == Lexeme.LexemeType.OP_DIV ||
+        //                type == Lexeme.LexemeType.OP_MUL ||
+        //                type == Lexeme.LexemeType.OP_MINUS ||
+        //                type == Lexeme.LexemeType.OP_PLUS ||
+        //                type == Lexeme.LexemeType.ARGUMENT_SEPARATOR;
+        //    }
+        //    else
+        //    {
+        //        return false;
+        //    }
+        //}
+
         protected bool canProcessTokenAsUnaryOp()
         {
-            if (previousInput == null)
+            if (lastProcessedElement == null)
             {
                 return true;
             }
-            else if (previousInput is Lexeme)
+            else if (lastProcessedElement is Lexeme)
             {
-                Lexeme previous = previousInput as Lexeme;
+                Lexeme previous = lastProcessedElement as Lexeme;
                 Lexeme.LexemeType type = previous.Type;
                 return type == Lexeme.LexemeType.LEFT_PAREN ||
                         type == Lexeme.LexemeType.EQ_SIGN ||
@@ -220,6 +269,12 @@ namespace OMathParser.Syntax
             {
                 return false;
             }
+        }
+
+        protected bool canAddImplicitMultiplication()
+        {
+            return canProduceValue(lastProcessedElement) &&
+                    canProduceValue(peekNextInput());
         }
 
         protected SyntaxNode processValueProducerLexeme(Lexeme lexeme)
@@ -397,12 +452,14 @@ namespace OMathParser.Syntax
 
                 FunctionApplyNode funcApplyNode = new FunctionApplyNode(arguments, funcDefinition, fName.Value);
                 output.Enqueue(funcApplyNode);
+                lastProcessedElement = funcApplyNode;
             }
             else if (next is Lexeme && (next as Lexeme).Type == Lexeme.LexemeType.LEFT_PAREN)
             {
                 openedArgumentLists++;
                 operatorStack.Push(fName);
                 operatorStack.Push(next as Lexeme);
+                lastProcessedElement = next as Lexeme;
             }
             else
             {

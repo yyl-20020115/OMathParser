@@ -129,7 +129,7 @@ namespace OMathParser.Syntax
             }
         }
 
-        protected void processArgumentSeparator()
+        protected new void processArgumentSeparator()
         {
             if (openedArgumentLists == 0)
             {
@@ -191,6 +191,7 @@ namespace OMathParser.Syntax
             }
 
             List<ISyntaxUnit> argumentPostfix = clearOutput();
+            lastProcessedElement = null;
             SyntaxNode argumentNode = buildSyntaxTree(argumentPostfix);
             processedArguments.Add(argumentNode);
 
