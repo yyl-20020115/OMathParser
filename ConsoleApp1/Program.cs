@@ -30,9 +30,10 @@ namespace ConsoleApp1
 
             List<OfficeMath> mathExpressions = new List<OfficeMath>(docBody.Descendants<OfficeMath>());
             Console.WriteLine(mathExpressions.Count + " expressions found:");
+            mathExpressions.Reverse();
             foreach (var expression in mathExpressions)
             {
-                if (!expression.HasChildren)
+                if (String.IsNullOrWhiteSpace(expression.InnerText))
                 {
                     continue;
                 }

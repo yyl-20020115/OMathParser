@@ -24,7 +24,10 @@ namespace OMathParser.Tokens.OXMLTokens
 
         public void addToken(IToken token)
         {
-            this.Add(token);
+            if (token != null)
+            {
+                this.Add(token);
+            }
         }
 
         public string simpleRepresentation()
