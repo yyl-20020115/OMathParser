@@ -110,16 +110,27 @@ namespace OMathParser.Syntax
             if (op.IsRightAssociative())
             {
                 // pushing a right-associative operator
+                // pop the top of the stack into the output queue as long as it isn't 
+                // an opening parenthesis or its precedence is lower or equal to that of
+                // the operator being pushed onto the stack
                 try
                 {
-                    Lexeme top = operatorStack.Peek();
-                    while (top.Type != Lexeme.LexemeType.LEFT_PAREN || top.IsHigherPrecedence(op))
+                    while (true)
                     {
-                        // pop the top of the stack into the output queue as long as it isn't 
-                        // an opening parenthesis or its precedence is lower or equal to that of
-                        // the operator being pushed onto the stack
-                        output.Enqueue(operatorStack.Pop());
-                        top = operatorStack.Peek();
+                        Lexeme stackTop = operatorStack.Peek();
+                        if (stackTop.Type == Lexeme.LexemeType.LEFT_PAREN)
+                        {
+                            break;
+                        }
+                        else if (stackTop.IsHigherPrecedenceThan(op))
+                        {
+                            output.Enqueue(stackTop);
+                            operatorStack.Pop();
+                        }
+                        else
+                        {
+                            break;
+                        }
                     }
                 }
                 catch (InvalidOperationException ex)
@@ -133,18 +144,27 @@ namespace OMathParser.Syntax
             else
             {
                 // pushing a left-associative operator
+                // pop the top of the stack into the output queue as long as it isn't 
+                // an opening parenthesis or its precedence is lower to that of
+                // the operator being pushed onto the stack
                 try
                 {
-                    Lexeme top = operatorStack.Peek();
-                    while (top.Type != Lexeme.LexemeType.LEFT_PAREN 
-                            || top.IsHigherPrecedence(op) 
-                            || top.IsEqualPrecedence(op))
+                    while (true)
                     {
-                        // pop the top of the stack into the output queue as long as it isn't 
-                        // an opening parenthesis or its precedence is lower to that of
-                        // the operator being pushed onto the stack
-                        output.Enqueue(operatorStack.Pop());
-                        top = operatorStack.Peek();
+                        Lexeme stackTop = operatorStack.Peek();
+                        if (stackTop.Type == Lexeme.LexemeType.LEFT_PAREN)
+                        {
+                            break;
+                        }
+                        else if (!stackTop.IsLowerPrecedenceThan(op))
+                        {
+                            output.Enqueue(stackTop);
+                            operatorStack.Pop();
+                        }
+                        else
+                        {
+                            break;
+                        }
                     }
                 }
                 catch (InvalidOperationException ex)

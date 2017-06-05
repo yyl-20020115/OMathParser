@@ -94,7 +94,7 @@ namespace OMathParser.Lexical
             return this.isOperator;
         }
          
-        public bool IsHigherPrecedence(Lexeme other)
+        public bool IsHigherPrecedenceThan(Lexeme other)
         {
             return this.precedence > other.precedence;
         }
@@ -104,7 +104,7 @@ namespace OMathParser.Lexical
             return this.precedence == other.precedence;
         }
 
-        public bool IsLowerPrecedence(Lexeme other)
+        public bool IsLowerPrecedenceThan(Lexeme other)
         {
             return this.precedence < other.precedence;
         }
