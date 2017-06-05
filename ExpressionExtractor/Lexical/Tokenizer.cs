@@ -29,7 +29,8 @@ namespace OMathParser.Lexical
             while (i < run.Length)
             {
                 char current = run[i];
-                if (Char.IsWhiteSpace(current))
+                if (Char.IsWhiteSpace(current) ||
+                    Char.GetUnicodeCategory(current) == System.Globalization.UnicodeCategory.Format)
                 {
                     i++;
                 }
