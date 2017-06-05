@@ -6,7 +6,10 @@ using System.Threading.Tasks;
 
 using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Math;
+using DocumentFormat.OpenXml.Wordprocessing;
 using OfficeMath = DocumentFormat.OpenXml.Math.OfficeMath;
+using Run = DocumentFormat.OpenXml.Math.Run;
+using Text = DocumentFormat.OpenXml.Math.Text;
 
 using OMathParser.Tokens.OXMLTokens;
 using OMathParser.Tokens.OXMLTokens.Abstract;
@@ -74,6 +77,10 @@ namespace OMathParser.Tokens
             else if (e is MathFunction)
             {
                 return processMathFunction(e as MathFunction);
+            }
+            else if (e is BookmarkStart || e is BookmarkEnd)
+            {
+                return null;
             }
             else
             {
