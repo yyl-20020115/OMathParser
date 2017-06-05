@@ -188,10 +188,12 @@ namespace OMathParser.Syntax
                 {
                     throw new ParseException("Given token cannot be pushed into the output queue as a value producer.");
                 }
+
+                output.Enqueue(processed);
+                lastProcessedElement = processed;
             }
 
-            output.Enqueue(processed);
-            lastProcessedElement = processed;
+
         }
 
         protected bool canProduceValue(Object token)
