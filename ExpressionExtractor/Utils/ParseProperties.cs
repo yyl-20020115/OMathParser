@@ -45,6 +45,12 @@ namespace OMathParser.Utils
 
             functionDeclarations.Add("tan", 1);
             functionDefinitions.Add("tan", arguments => Math.Tan(arguments[0]));
+
+            functionDeclarations.Add("log", 1);
+            functionDefinitions.Add("log", arguments => Math.Log10(arguments[0]));
+
+            functionDeclarations.Add("ln", 1);
+            functionDefinitions.Add("ln", arguments => Math.Log(arguments[0]));
         }
 
         private void populateSpecialCharacters()
