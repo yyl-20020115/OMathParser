@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApp1", "ConsoleApp1\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OMathParser", "ExpressionExtractor\OMathParser.csproj", "{420D5A20-EE03-40DF-88DF-2830C82C7CD4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OMathPlotter", "OMathPlotter\OMathPlotter.csproj", "{C5EC7238-DB4E-4092-BC70-3A4BD3BFA669}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{420D5A20-EE03-40DF-88DF-2830C82C7CD4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{420D5A20-EE03-40DF-88DF-2830C82C7CD4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{420D5A20-EE03-40DF-88DF-2830C82C7CD4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C5EC7238-DB4E-4092-BC70-3A4BD3BFA669}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C5EC7238-DB4E-4092-BC70-3A4BD3BFA669}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C5EC7238-DB4E-4092-BC70-3A4BD3BFA669}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C5EC7238-DB4E-4092-BC70-3A4BD3BFA669}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
