@@ -41,7 +41,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Expression.cs" />
     <Compile Include="Lexical\Lexeme.cs" />
     <Compile Include="Lexical\NumericLiteralMatcher.cs" />
     <Compile Include="Lexical\Tokenizer.cs" />

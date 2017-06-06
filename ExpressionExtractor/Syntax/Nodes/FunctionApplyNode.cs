@@ -33,5 +33,8 @@ namespace OMathParser.Syntax.Nodes
         {
             return String.Format("FuncApply: {0}({1}) ", name, arguments.simpleRepresentation());
         }
+
+        public ArgumentListNode Arguments { get => arguments; }
+        public int ArgumentsCount { get => arguments.Count; }
     }
 }

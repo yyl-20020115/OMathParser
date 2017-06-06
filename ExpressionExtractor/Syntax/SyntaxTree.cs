@@ -16,5 +16,7 @@ namespace OMathParser.Syntax
         {
             this.root = root;
         }
+
+        public SyntaxNode RootNode { get => root; }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,7 +10,7 @@ using OMathParser.Utils;
 
 namespace OMathParser.Syntax.Nodes
 {
-    public class ArgumentListNode : ISimplifiable
+    public class ArgumentListNode : ISimplifiable, IEnumerable<SyntaxNode>
     {
         private List<SyntaxNode> arguments;
 
@@ -48,6 +49,16 @@ namespace OMathParser.Syntax.Nodes
             }
             
             return "ArgumentList: [" + sb.ToString() + "]";
+        }
+
+        public IEnumerator<SyntaxNode> GetEnumerator()
+        {
+            return arguments.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return arguments.GetEnumerator();
         }
 
         public int Count { get => arguments.Count; }
