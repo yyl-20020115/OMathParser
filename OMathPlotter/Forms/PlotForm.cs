@@ -10,13 +10,16 @@ using System.Windows.Forms;
 
 using DocumentFormat.OpenXml.Wordprocessing;
 using DocumentFormat.OpenXml.Packaging;
+using OfficeMath = DocumentFormat.OpenXml.Math.OfficeMath;
 
 using OxyPlot.WindowsForms;
 using OxyPlot;
 using OxyPlot.Series;
 using System.IO;
 
+using OMathParser.Tokens;
 using OMathParser.Syntax;
+using OMathParser.Utils;
 
 namespace OMathPlotter.Forms
 {
@@ -24,19 +27,31 @@ namespace OMathPlotter.Forms
     {
         public class OpenXMLExpression
         {
-            public string sourceXml;
+            public OpenXMLExpression(OfficeMath source, SyntaxTree builtUpExpression)
+            {
+                this.sourceElement = source;
+                this.expressionTree = builtUpExpression;
+            }
+
+            public OfficeMath sourceElement;
             public SyntaxTree expressionTree;
         }
 
         private PlotView plotView;
-
+        private ParseProperties parseProperties;
+        private TokenTreeBuilder tokenTreeBuilder;
+        private SyntaxTreeBuilder syntaxTreeBuilder;
         private List<OpenXMLExpression> parsedExpressions;
 
         public PlotForm()
         {
             InitializeComponent();
             InitializePlotView();
-            plot();
+
+            this.parseProperties = new ParseProperties();
+            this.tokenTreeBuilder = new TokenTreeBuilder(parseProperties);
+            this.syntaxTreeBuilder = new SyntaxTreeBuilder(parseProperties);
+            this.parsedExpressions = new List<OpenXMLExpression>();
         }
 
         private void InitializePlotView()
@@ -76,7 +91,23 @@ namespace OMathPlotter.Forms
 
         private void extractMathExpressions(WordprocessingDocument doc)
         {
-            
+            Body docBody = doc.MainDocumentPart.Document.Body;
+            List<OfficeMath> mathExpressions = new List<OfficeMath>(docBody.Descendants<OfficeMath>());
+
+            parsedExpressions.Clear();
+            foreach (var expression in mathExpressions)
+            {
+                try
+                {
+                    var tokenTree = tokenTreeBuilder.build(expression);
+                    var syntaxTree = syntaxTreeBuilder.Build(tokenTree);
+                    parsedExpressions.Add(new OpenXMLExpression(expression, syntaxTree));
+                }
+                catch (Exception ex)
+                {
+
+                }
+            }
         }
 
         private void openFileMenuItem_Click(object sender, EventArgs e)
