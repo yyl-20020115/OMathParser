@@ -29,16 +29,17 @@
         private void InitializeComponent()
         {
             this.menuStrip = new System.Windows.Forms.MenuStrip();
-            this.tabControl = new System.Windows.Forms.TabControl();
-            this.plotTab = new System.Windows.Forms.TabPage();
-            this.treeTab = new System.Windows.Forms.TabPage();
-            this.xmlTab = new System.Windows.Forms.TabPage();
-            this.expressionComboBox = new System.Windows.Forms.ComboBox();
             this.fileMenu = new System.Windows.Forms.ToolStripMenuItem();
             this.openFileMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.closeFileMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.exitMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.tabControl = new System.Windows.Forms.TabControl();
+            this.plotTab = new System.Windows.Forms.TabPage();
+            this.treeTab = new System.Windows.Forms.TabPage();
+            this.xmlTab = new System.Windows.Forms.TabPage();
+            this.expressionComboBox = new System.Windows.Forms.ComboBox();
+            this.openOXMLFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.menuStrip.SuspendLayout();
             this.tabControl.SuspendLayout();
             this.SuspendLayout();
@@ -52,6 +53,41 @@
             this.menuStrip.Size = new System.Drawing.Size(634, 24);
             this.menuStrip.TabIndex = 1;
             this.menuStrip.Text = "menuStrip1";
+            // 
+            // fileMenu
+            // 
+            this.fileMenu.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.openFileMenuItem,
+            this.closeFileMenuItem,
+            this.toolStripSeparator1,
+            this.exitMenuItem});
+            this.fileMenu.Name = "fileMenu";
+            this.fileMenu.Size = new System.Drawing.Size(37, 20);
+            this.fileMenu.Text = "File";
+            // 
+            // openFileMenuItem
+            // 
+            this.openFileMenuItem.Name = "openFileMenuItem";
+            this.openFileMenuItem.Size = new System.Drawing.Size(124, 22);
+            this.openFileMenuItem.Text = "Open";
+            this.openFileMenuItem.Click += new System.EventHandler(this.openFileMenuItem_Click);
+            // 
+            // closeFileMenuItem
+            // 
+            this.closeFileMenuItem.Name = "closeFileMenuItem";
+            this.closeFileMenuItem.Size = new System.Drawing.Size(124, 22);
+            this.closeFileMenuItem.Text = "Close File";
+            // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(121, 6);
+            // 
+            // exitMenuItem
+            // 
+            this.exitMenuItem.Name = "exitMenuItem";
+            this.exitMenuItem.Size = new System.Drawing.Size(124, 22);
+            this.exitMenuItem.Text = "Exit";
             // 
             // tabControl
             // 
@@ -82,7 +118,7 @@
             this.treeTab.Location = new System.Drawing.Point(4, 22);
             this.treeTab.Name = "treeTab";
             this.treeTab.Padding = new System.Windows.Forms.Padding(3);
-            this.treeTab.Size = new System.Drawing.Size(626, 357);
+            this.treeTab.Size = new System.Drawing.Size(618, 328);
             this.treeTab.TabIndex = 1;
             this.treeTab.Text = "Syntax Tree";
             this.treeTab.UseVisualStyleBackColor = true;
@@ -92,7 +128,7 @@
             this.xmlTab.Location = new System.Drawing.Point(4, 22);
             this.xmlTab.Name = "xmlTab";
             this.xmlTab.Padding = new System.Windows.Forms.Padding(3);
-            this.xmlTab.Size = new System.Drawing.Size(626, 319);
+            this.xmlTab.Size = new System.Drawing.Size(618, 328);
             this.xmlTab.TabIndex = 2;
             this.xmlTab.Text = "XML";
             this.xmlTab.UseVisualStyleBackColor = true;
@@ -108,39 +144,9 @@
             this.expressionComboBox.Size = new System.Drawing.Size(626, 21);
             this.expressionComboBox.TabIndex = 3;
             // 
-            // fileMenu
+            // openOXMLFileDialog
             // 
-            this.fileMenu.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.openFileMenuItem,
-            this.closeFileMenuItem,
-            this.toolStripSeparator1,
-            this.exitMenuItem});
-            this.fileMenu.Name = "fileMenu";
-            this.fileMenu.Size = new System.Drawing.Size(37, 20);
-            this.fileMenu.Text = "File";
-            // 
-            // openFileMenuItem
-            // 
-            this.openFileMenuItem.Name = "openFileMenuItem";
-            this.openFileMenuItem.Size = new System.Drawing.Size(152, 22);
-            this.openFileMenuItem.Text = "Open";
-            // 
-            // closeFileMenuItem
-            // 
-            this.closeFileMenuItem.Name = "closeFileMenuItem";
-            this.closeFileMenuItem.Size = new System.Drawing.Size(152, 22);
-            this.closeFileMenuItem.Text = "Close File";
-            // 
-            // toolStripSeparator1
-            // 
-            this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(149, 6);
-            // 
-            // exitMenuItem
-            // 
-            this.exitMenuItem.Name = "exitMenuItem";
-            this.exitMenuItem.Size = new System.Drawing.Size(152, 22);
-            this.exitMenuItem.Text = "Exit";
+            this.openOXMLFileDialog.FileName = "openFileDialog1";
             // 
             // PlotForm
             // 
@@ -174,5 +180,6 @@
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private System.Windows.Forms.ToolStripMenuItem exitMenuItem;
         private System.Windows.Forms.ComboBox expressionComboBox;
+        private System.Windows.Forms.OpenFileDialog openOXMLFileDialog;
     }
 }
