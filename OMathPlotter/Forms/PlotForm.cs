@@ -35,7 +35,7 @@ namespace OMathPlotter.Forms
             this.plotView.Margin = new System.Windows.Forms.Padding(0);
             this.plotView.TabIndex = 0;
 
-            plotViewPanel.Controls.Add(this.plotView);
+            plotTab.Controls.Add(this.plotView);
 
             ResumeLayout(true);
         }
