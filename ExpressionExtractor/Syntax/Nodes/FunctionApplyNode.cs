@@ -11,7 +11,6 @@ namespace OMathParser.Syntax.Nodes
     public class FunctionApplyNode : SyntaxNode
     {
         private String name;
-        private int nArguments;
         private ArgumentListNode arguments;
 
         public delegate double FunctionBody(double[] input);
@@ -32,6 +31,18 @@ namespace OMathParser.Syntax.Nodes
         public override string simpleRepresentation()
         {
             return String.Format("FuncApply: {0}({1}) ", name, arguments.simpleRepresentation());
+        }
+
+        public override string toInfixNotation()
+        {
+            String arguments = String.Join(", ", this.arguments.Select(arg => arg.toInfixNotation()));
+            return String.Format("{0}({1})", name, arguments);
+        }
+
+        public override string toPostfixNotation()
+        {
+            String arguments = String.Join(", ", this.arguments.Select(arg => arg.toPostfixNotation()));
+            return String.Format("{0}{1}[nArgs:{2}]", arguments, name, this.arguments.Count);
         }
 
         public ArgumentListNode Arguments { get => arguments; }

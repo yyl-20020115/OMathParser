@@ -15,5 +15,25 @@ namespace OMathParser.Syntax.Nodes.Abstract
         {
             this.child = child;
         }
+
+        protected string toInfixNotation(String operatorString)
+        {
+            String child = this.child.toInfixNotation();
+
+            if (!(this.child is ConstantIdentifierNode ||
+                    this.child is LiteralNode ||
+                    this.child is VariableIdentifierNode))
+            {
+                child = "(" + child + ")";
+            }
+
+            return String.Format("{0}[u{1}]", child, operatorString);
+        }
+
+        protected string toPostfixNotation(String operatorString)
+        {
+            String child = this.child.toPostfixNotation();
+            return String.Format("{0}[{1}u]", child, operatorString);
+        }
     }
 }

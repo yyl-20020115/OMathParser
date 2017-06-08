@@ -21,5 +21,8 @@ namespace OMathParser.Syntax.Nodes.Abstract
         {
             return this.simpleRepresentation();
         }
+
+        public abstract string toInfixNotation();
+        public abstract string toPostfixNotation();
     }
 }

@@ -33,5 +33,15 @@ namespace OMathParser.Syntax.Nodes
         {
             return "VariableIdentifier: " + name;
         }
+
+        public override string toInfixNotation()
+        {
+            return name;
+        }
+
+        public override string toPostfixNotation()
+        {
+            return name;
+        }
     }
 }

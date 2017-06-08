@@ -23,8 +23,6 @@ namespace OMathParser.Syntax
         protected Queue<ISyntaxUnit> output;
         protected Stack<Lexeme> operatorStack;
 
-        //private IToken currentInput;
-        //private IToken previousInput;   // TODO: ne radi kak spada, previousInput nikad nebude Lexeme, promijeni kak se previousInput postavlja!!
         protected ISyntaxUnit lastProcessedElement;
         protected int openedArgumentLists;
 

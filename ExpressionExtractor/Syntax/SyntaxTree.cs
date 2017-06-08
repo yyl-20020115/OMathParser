@@ -17,6 +17,16 @@ namespace OMathParser.Syntax
             this.root = root;
         }
 
+        public string toInfixNotation()
+        {
+            return root.toInfixNotation();
+        }
+
+        public string toPostfixNotation()
+        {
+            return root.toPostfixNotation();
+        }
+
         public SyntaxNode RootNode { get => root; }
     }
 }

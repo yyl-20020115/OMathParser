@@ -26,5 +26,15 @@ namespace OMathParser.Syntax.Nodes
         {
             return String.Format("Literal: " + value.ToString());
         }
+
+        public override string toInfixNotation()
+        {
+            return value.ToString();
+        }
+
+        public override string toPostfixNotation()
+        {
+            return value.ToString();
+        }
     }
 }

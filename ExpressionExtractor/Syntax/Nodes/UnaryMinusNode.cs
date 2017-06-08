@@ -23,5 +23,15 @@ namespace OMathParser.Syntax.Nodes
         {
             return String.Format("UnaryMinus: {0} ", child.simpleRepresentation());
         }
+
+        public override string toInfixNotation()
+        {
+            return base.toInfixNotation("-");
+        }
+
+        public override string toPostfixNotation()
+        {
+            return base.toPostfixNotation("-");
+        }
     }
 }

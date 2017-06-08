@@ -33,5 +33,15 @@ namespace OMathParser.Syntax.Nodes
         {
             return String.Format("ConstantIdentifier: {0}={1}", name, value.ToString());
         }
+
+        public override string toInfixNotation()
+        {
+            return name;
+        }
+
+        public override string toPostfixNotation()
+        {
+            return name;
+        }
     }
 }

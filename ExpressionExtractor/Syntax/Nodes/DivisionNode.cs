@@ -23,5 +23,15 @@ namespace OMathParser.Syntax.Nodes
         {
             return String.Format("Div: {0} / {1} ", left.simpleRepresentation(), right.simpleRepresentation());
         }
+
+        public override string toInfixNotation()
+        {
+            return base.toInfixNotation("÷");
+        }
+
+        public override string toPostfixNotation()
+        {
+            return base.toPostfixNotation("÷");
+        }
     }
 }

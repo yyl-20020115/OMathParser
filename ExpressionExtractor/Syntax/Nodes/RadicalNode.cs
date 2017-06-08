@@ -24,5 +24,15 @@ namespace OMathParser.Syntax.Nodes
         {
             return String.Format("Root: {0} √ {1} ", right.simpleRepresentation(), left.simpleRepresentation());
         }
+
+        public override string toInfixNotation()
+        {
+            return base.toInfixNotation("√");
+        }
+
+        public override string toPostfixNotation()
+        {
+            return base.toPostfixNotation("√");
+        }
     }
 }
