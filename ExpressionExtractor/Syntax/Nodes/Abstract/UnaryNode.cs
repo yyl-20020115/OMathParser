@@ -27,13 +27,13 @@ namespace OMathParser.Syntax.Nodes.Abstract
                 child = "(" + child + ")";
             }
 
-            return String.Format("{0}[u{1}]", child, operatorString);
+            return String.Format("[u{0}]{1}", operatorString, child);
         }
 
         protected string toPostfixNotation(String operatorString)
         {
             String child = this.child.toPostfixNotation();
-            return String.Format("{0}[{1}u]", child, operatorString);
+            return String.Format("{0} [{1}u]", child, operatorString);
         }
     }
 }
