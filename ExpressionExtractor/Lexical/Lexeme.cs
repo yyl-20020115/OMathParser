@@ -16,6 +16,7 @@ namespace OMathParser.Lexical
             IDENTIFIER_VAR,
             IDENTIFIER_CONST,
             FUNCTION_NAME,
+            UNDECLARED_IDENTIFIER,
             REAL_VALUE,
             LEFT_PAREN,
             RIGHT_PAREN,
@@ -38,6 +39,7 @@ namespace OMathParser.Lexical
             precedenceMap.Add(LexemeType.IDENTIFIER_VAR, -1);
             precedenceMap.Add(LexemeType.IDENTIFIER_CONST, -1);
             precedenceMap.Add(LexemeType.FUNCTION_NAME, -1);
+            precedenceMap.Add(LexemeType.UNDECLARED_IDENTIFIER, -1);
             precedenceMap.Add(LexemeType.REAL_VALUE, -1);
             precedenceMap.Add(LexemeType.LEFT_PAREN, -1);
             precedenceMap.Add(LexemeType.RIGHT_PAREN, -1);

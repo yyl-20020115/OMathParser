@@ -10,14 +10,16 @@ namespace OMathParser.Utils
 {
     public class ParseProperties
     {
+        private bool addUndeclaredIdentifiers;
         private ISet<String> identifiers;
         private IDictionary<String, double> constants;
         private IDictionary<String, int> functionDeclarations;
         private IDictionary<String, FunctionApplyNode.FunctionBody> functionDefinitions;
         private ISet<Char> specialCharacters;
 
-        public ParseProperties()
+        public ParseProperties(bool addUndeclaredIdentifiers = false)
         {
+            this.addUndeclaredIdentifiers = addUndeclaredIdentifiers;
             identifiers = new HashSet<String>();
             constants = new Dictionary<String, double>();
             functionDeclarations = new Dictionary<String, int>();

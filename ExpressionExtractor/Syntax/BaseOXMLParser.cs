@@ -35,8 +35,6 @@ namespace OMathParser.Syntax
             this.output = new Queue<ISyntaxUnit>();
             this.operatorStack = new Stack<Lexeme>();
 
-            //this.currentInput = null;
-            //this.previousInput = null;
             this.lastProcessedElement = null;
             this.openedArgumentLists = 0;
         }
@@ -75,9 +73,6 @@ namespace OMathParser.Syntax
         
         protected IToken pollNextInput()
         {
-            //previousInput = currentInput;
-            //currentInput = input.Dequeue();
-            //return currentInput;
             return input.Dequeue();
         }
 
@@ -242,30 +237,6 @@ namespace OMathParser.Syntax
 
             return false;
         }
-
-        //protected bool canProcessTokenAsUnaryOp()
-        //{
-        //    if (previousInput == null)
-        //    {
-        //        return true;
-        //    }
-        //    else if (previousInput is Lexeme)
-        //    {
-        //        Lexeme previous = previousInput as Lexeme;
-        //        Lexeme.LexemeType type = previous.Type;
-        //        return type == Lexeme.LexemeType.LEFT_PAREN ||
-        //                type == Lexeme.LexemeType.EQ_SIGN ||
-        //                type == Lexeme.LexemeType.OP_DIV ||
-        //                type == Lexeme.LexemeType.OP_MUL ||
-        //                type == Lexeme.LexemeType.OP_MINUS ||
-        //                type == Lexeme.LexemeType.OP_PLUS ||
-        //                type == Lexeme.LexemeType.ARGUMENT_SEPARATOR;
-        //    }
-        //    else
-        //    {
-        //        return false;
-        //    }
-        //}
 
         protected bool canProcessTokenAsUnaryOp()
         {

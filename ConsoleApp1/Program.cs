@@ -19,7 +19,7 @@ namespace ConsoleApp1
     {
         static void Main(string[] args)
         {
-            String docPath = @"D:\Documents\Skola\TVZ\2. sem\OpenXML\proba - Copy.docx";
+            String docPath = @"..\..\proba - Copy.docx";
 
             WordprocessingDocument doc = WordprocessingDocument.Open(docPath, false);
             Body docBody = doc.MainDocumentPart.Document.Body;
@@ -29,8 +29,6 @@ namespace ConsoleApp1
             SyntaxTreeBuilder syntaxTreeBuilder = new SyntaxTreeBuilder(parseProperties);
 
             List<OfficeMath> mathExpressions = new List<OfficeMath>(docBody.Descendants<OfficeMath>());
-            Console.WriteLine(mathExpressions.Count + " expressions found:");
-            //mathExpressions.Reverse();
             foreach (var expression in mathExpressions)
             {
                 if (String.IsNullOrWhiteSpace(expression.InnerText))
@@ -38,9 +36,18 @@ namespace ConsoleApp1
                     continue;
                 }
 
+                Console.WriteLine("OMath paragraph found!");
+                Console.WriteLine(System.Xml.Linq.XDocument.Parse(expression.OuterXml).ToString());
+
                 TokenTree tokenTree = tokenTreeBuilder.build(expression);
                 SyntaxTree syntaxTree = syntaxTreeBuilder.Build(tokenTree);
-                Console.WriteLine("Tree built");
+
+                Console.WriteLine("\nSyntax tree built!");
+                Console.WriteLine("Postfix notation: ");
+                Console.WriteLine(syntaxTree.toPostfixNotation());
+                Console.WriteLine("Infix notation: ");
+                Console.WriteLine(syntaxTree.toInfixNotation());
+                Console.WriteLine("\n====================================================================\n");
             }
 
 
