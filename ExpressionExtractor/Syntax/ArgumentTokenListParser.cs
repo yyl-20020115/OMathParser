@@ -16,33 +16,26 @@ namespace OMathParser.Syntax
     public class ArgumentTokenListParser : BaseOXMLParser
     {
         private List<SyntaxNode> processedArguments;
-        private readonly int argumentsNeeded;
-
-        public ArgumentTokenListParser(ParseProperties properties, TokenList arguments, int nArguments) 
+        
+        public ArgumentTokenListParser(ParseProperties properties, TokenList arguments) 
             : base(properties)
         {
             this.processedArguments = new List<SyntaxNode>();
-            this.argumentsNeeded = nArguments;
             populateInputQueue(arguments);
         }
 
         public ArgumentListNode Parse()
         {
             constructArguments();
-            if (processedArguments.Count() < argumentsNeeded)
-            {
-                throw new ParseException("Too few arguments given for function call.");
-            }
-            else if (processedArguments.Count() > argumentsNeeded)
-            {
-                throw new ParseException("Too many arguments given for function call.");
-            }
-            else
+            if (processedArguments.Count > 0)
             {
                 return new ArgumentListNode(processedArguments);
             }
+            else
+            {
+                throw new ParseException("Couldn't parse a single argument from given TokenList");
+            }
         }
-
 
         private void constructArguments()
         {
@@ -58,11 +51,6 @@ namespace OMathParser.Syntax
                     if (outputCount() > 0)
                     {
                         constructSingleArgument();
-                    }
-
-                    if (processedArguments.Count() < argumentsNeeded)
-                    {
-                        throw new ParseException("Too few arguments successfully parsed.");
                     }
 
                     return;
@@ -123,7 +111,7 @@ namespace OMathParser.Syntax
                     }
                     else
                     {
-                        //Lexeme.LexemeType.EQ_SIGN not allow inside argument list
+                        //Lexeme.LexemeType.EQ_SIGN not allowed inside argument list
                         throw new ParseException("Unknown token type encountered in input.");
                     }
                 }
@@ -195,11 +183,6 @@ namespace OMathParser.Syntax
             lastProcessedElement = null;
             SyntaxNode argumentNode = buildSyntaxTree(argumentPostfix);
             processedArguments.Add(argumentNode);
-
-            if (processedArguments.Count == argumentsNeeded && inputCount() > 0)
-            {
-                throw new ParseException("Extra tokens in input after processing all function call arguments.");
-            }
         }
     }
 }

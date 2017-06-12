@@ -394,7 +394,7 @@ namespace OMathParser.Syntax
         protected ArgumentListNode parseArgumentList(TokenList argumentList, int argumentsNeeded)
         {
             ArgumentTokenListParser argumentListParser = 
-                new ArgumentTokenListParser(properties, argumentList, argumentsNeeded);
+                new ArgumentTokenListParser(properties, argumentList);
             return argumentListParser.Parse();
         }
 
@@ -402,7 +402,7 @@ namespace OMathParser.Syntax
         {
             List<SyntaxNode> processedArguments = new List<SyntaxNode>();
             ArgumentTokenListParser argumentListParser =
-                new ArgumentTokenListParser(properties, argumentList.Elements, argumentsNeeded);
+                new ArgumentTokenListParser(properties, argumentList.Elements);
             return argumentListParser.Parse();
         }
 
