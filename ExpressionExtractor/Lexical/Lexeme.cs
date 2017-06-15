@@ -13,9 +13,7 @@ namespace OMathParser.Lexical
     public class Lexeme : ISimplifiable, ISyntaxUnit, IToken
     {
         public enum LexemeType {
-            IDENTIFIER_VAR,
-            IDENTIFIER_CONST,
-            FUNCTION_NAME,
+            IDENTIFIER,
             REAL_VALUE,
             LEFT_PAREN,
             RIGHT_PAREN,
@@ -35,9 +33,7 @@ namespace OMathParser.Lexical
         static Lexeme()
         {
             precedenceMap = new Dictionary<LexemeType, int>();
-            precedenceMap.Add(LexemeType.IDENTIFIER_VAR, -1);
-            precedenceMap.Add(LexemeType.IDENTIFIER_CONST, -1);
-            precedenceMap.Add(LexemeType.FUNCTION_NAME, -1);
+            precedenceMap.Add(LexemeType.IDENTIFIER, -1);
             precedenceMap.Add(LexemeType.REAL_VALUE, -1);
             precedenceMap.Add(LexemeType.LEFT_PAREN, -1);
             precedenceMap.Add(LexemeType.RIGHT_PAREN, -1);

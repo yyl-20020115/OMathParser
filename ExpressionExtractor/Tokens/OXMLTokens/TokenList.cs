@@ -22,11 +22,18 @@ namespace OMathParser.Tokens.OXMLTokens
 
         
 
-        public void addToken(IToken token)
+        public void Append(IToken token)
         {
             if (token != null)
             {
-                this.Add(token);
+                if (token is TokenList)
+                {
+                    this.AddRange(token as TokenList);
+                }
+                else
+                {
+                    this.Add(token);
+                }
             }
         }
 

@@ -22,12 +22,12 @@ namespace OMathParser.Tokens.OXMLTokens
 
         public void addBaseToken(IToken t)
         {
-            supBase.addToken(t);
+            supBase.Append(t);
         }
 
         public void addSupArgumentToken(IToken t)
         {
-            supArgument.addToken(t);
+            supArgument.Append(t);
         }
 
         public override string simpleRepresentation()

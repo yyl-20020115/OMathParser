@@ -86,7 +86,7 @@ namespace OMathParser.Syntax
                 {
                     Lexeme currentLexeme = current as Lexeme;
                     Lexeme.LexemeType type = currentLexeme.Type;
-                    if (type == Lexeme.LexemeType.FUNCTION_NAME)
+                    if (properties.IsFunctionName(currentLexeme.Value))
                     {
                         processFunctionNameLexeme(currentLexeme);
                     }
@@ -166,7 +166,7 @@ namespace OMathParser.Syntax
 
                     if (popped.Type == Lexeme.LexemeType.LEFT_PAREN)
                     {
-                        if (operatorStack.Peek().Type != Lexeme.LexemeType.FUNCTION_NAME)
+                        if (!properties.IsFunctionName(operatorStack.Peek().Value))
                         {
                             throw new ParseException("Unexpected function argument separator (',') found.");
                         }

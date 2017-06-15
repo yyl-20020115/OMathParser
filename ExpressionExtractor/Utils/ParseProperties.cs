@@ -98,17 +98,17 @@ namespace OMathParser.Utils
             
         }
 
-        public bool isConstantIdentifierDeclared(String name)
+        public bool IsConstant(String name)
         {
             return constants.ContainsKey(name);
         }
 
-        public bool isVariableIdentifierDeclared(String name)
+        public bool IsVariable(String name)
         {
             return identifiers.Contains(name);
         }
 
-        public bool isFunctionNameDeclared(String name)
+        public bool IsFunctionName(String name)
         {
             return functionDeclarations.ContainsKey(name);
         }

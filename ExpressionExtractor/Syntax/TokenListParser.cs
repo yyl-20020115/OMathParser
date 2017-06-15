@@ -62,7 +62,7 @@ namespace OMathParser.Syntax
                 {
                     Lexeme currentLexeme = current as Lexeme;
                     Lexeme.LexemeType type = currentLexeme.Type;
-                    if (type == Lexeme.LexemeType.FUNCTION_NAME)
+                    if (properties.IsFunctionName(currentLexeme.Value))
                     {
                         processFunctionNameLexeme(currentLexeme);
                     }
@@ -115,9 +115,9 @@ namespace OMathParser.Syntax
             }
         }
 
-        public SyntaxNode parse()
+        public SyntaxNode parse(TokenList infix)
         {
-            List<ISyntaxUnit> postfixForm = convertToPostfix();
+            List<ISyntaxUnit> postfixForm = convertToPostfix(infix);
             return buildSyntaxTree(postfixForm);
         }
     }
