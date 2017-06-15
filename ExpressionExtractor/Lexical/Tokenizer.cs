@@ -112,7 +112,14 @@ namespace OMathParser.Lexical
             while (Char.IsLetter(c) || c == '_')
             {
                 i++;
-                c = input[i];
+                if (i >= input.Length)
+                {
+                    break;
+                }
+                else
+                {
+                    c = input[i];
+                }
             }
 
             if (i > startPos)

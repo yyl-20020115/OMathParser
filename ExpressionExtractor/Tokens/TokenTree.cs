@@ -13,7 +13,6 @@ namespace OMathParser.Tokens
         private TokenList rootTokens;
         private ISet<string> identifiers;
 
-
         public TokenTree(TokenList rootTokens, ISet<string> identifiers)
         {
             this.rootTokens = rootTokens;
