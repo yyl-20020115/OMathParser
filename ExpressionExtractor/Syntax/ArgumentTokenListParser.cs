@@ -16,19 +16,28 @@ namespace OMathParser.Syntax
     public class ArgumentTokenListParser : BaseOXMLParser
     {
         private List<SyntaxNode> processedArguments;
-        private readonly int argumentsNeeded;
+        private int argumentsNeeded;
 
-        public ArgumentTokenListParser(ParseProperties properties, TokenList arguments, int nArguments) 
+        public ArgumentTokenListParser(ParseProperties properties) 
             : base(properties)
         {
             this.processedArguments = new List<SyntaxNode>();
-            this.argumentsNeeded = nArguments;
-            populateInputQueue(arguments);
         }
 
-        public ArgumentListNode Parse()
+        new private void reset(int argumentsNeeded)
         {
+            base.reset();
+            processedArguments.Clear();
+            this.argumentsNeeded = argumentsNeeded;
+        }
+
+        public ArgumentListNode Parse(TokenList arguments, int nArguments)
+        {
+            this.reset(nArguments);
+            populateInputQueue(arguments);
+
             constructArguments();
+
             if (processedArguments.Count() < argumentsNeeded)
             {
                 throw new ParseException("Too few arguments given for function call.");

@@ -35,10 +35,17 @@ namespace OMathParser.Syntax
             this.output = new Queue<ISyntaxUnit>();
             this.operatorStack = new Stack<Lexeme>();
 
-            //this.currentInput = null;
-            //this.previousInput = null;
             this.lastProcessedElement = null;
             this.openedArgumentLists = 0;
+        }
+
+        protected void reset()
+        {
+            input.Clear();
+            output.Clear();
+            operatorStack.Clear();
+            lastProcessedElement = null;
+            openedArgumentLists = 0;
         }
 
         protected void populateInputQueue(TokenList tokens)
@@ -75,9 +82,6 @@ namespace OMathParser.Syntax
         
         protected IToken pollNextInput()
         {
-            //previousInput = currentInput;
-            //currentInput = input.Dequeue();
-            //return currentInput;
             return input.Dequeue();
         }
 

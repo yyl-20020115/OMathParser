@@ -16,14 +16,17 @@ namespace OMathParser.Syntax
 {
     public class TokenListParser : BaseOXMLParser
     {
-        public TokenListParser(ParseProperties properties, TokenList tokens)
+        public TokenListParser(ParseProperties properties)
             : base(properties)
         {
-            populateInputQueue(tokens);
         }
 
-        private List<ISyntaxUnit> convertToPostfix()
+
+        private List<ISyntaxUnit> convertToPostfix(TokenList tokens)
         {
+            this.reset();
+            populateInputQueue(tokens);
+
             while (true)
             {
                 IToken current;
