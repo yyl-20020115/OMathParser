@@ -20,7 +20,7 @@ namespace OMathParser.Lexical
             this.literalMatcher = new NumericLiteralMatcher(properties);
         }
 
-        public List<Lexeme> Tokenize(String run)
+        public List<Lexeme> Tokenize(String run, bool matchPredefinedIdentifiers)
         {
             List<Lexeme> lexemes = new List<Lexeme>();
 
@@ -82,6 +82,12 @@ namespace OMathParser.Lexical
                 else
                 {
                     Lexeme matched = matchIdentifierName(run, i);
+                    if (matchPredefinedIdentifiers)
+                    {
+                        // TODO :  
+                        matched = matchDefinedIdentifier(run, i);
+                    }
+
                     if (matched != null)
                     {
                         lexemes.Add(matched);
@@ -104,27 +110,41 @@ namespace OMathParser.Lexical
             return lexemes;
         }
 
-        private Lexeme matchIdentifierName(string input, int startPos)
+        private Lexeme matchDefinedIdentifier(string input, int startPos)
         {
-            int i = startPos;
-            
-            char c = input[i];
-            while (Char.IsLetter(c) || c == '_')
+            string inputStart = input.Substring(startPos);
+            foreach (var func in properties.Functions)
             {
-                i++;
-                if (i >= input.Length)
+                if (inputStart.StartsWith(func.Key))
                 {
-                    break;
-                }
-                else
-                {
-                    c = input[i];
+                    return new Lexeme(Lexeme.LexemeType.IDENTIFIER, func.Key);
                 }
             }
 
-            if (i > startPos)
+            foreach (var variable in properties.VariableIdentifiers)
             {
-                return new Lexeme(Lexeme.LexemeType.IDENTIFIER, input.Substring(startPos, i - startPos));
+                if (inputStart.StartsWith(variable))
+                {
+                    return new Lexeme(Lexeme.LexemeType.IDENTIFIER, variable);
+                }
+            }
+
+            foreach (var constant in properties.ConstantIdentifiers)
+            {
+                if (inputStart.StartsWith(constant.Key))
+                {
+                    return new Lexeme(Lexeme.LexemeType.IDENTIFIER, constant.Key);
+                }
+            }
+
+            return null;
+        }
+
+        private Lexeme matchIdentifierName(string input, int startPos)
+        {
+            if (Char.IsLetter(input[startPos]))
+            {
+                return new Lexeme(Lexeme.LexemeType.IDENTIFIER, input.Substring(startPos, 1));
             }
             else
             {

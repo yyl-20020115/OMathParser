@@ -55,7 +55,7 @@ namespace OMathParser.Syntax
                 if (t is TextRunToken)
                 {
                     String run = (t as TextRunToken).Text;
-                    foreach (IToken lexeme in textRunTokenizer.Tokenize(run))
+                    foreach (IToken lexeme in textRunTokenizer.Tokenize(run, true))
                     {
                         input.Enqueue(lexeme);
                     }
@@ -316,10 +316,10 @@ namespace OMathParser.Syntax
             TokenList fNameNode = func.FunctionName;
             if (fNameNode.Count == 1)
             {
-                if (fNameNode[0] is TextRunToken)
+                if (fNameNode[0] is Lexeme)
                 {
                     // Samo naziv funkcije u fName, bez ikakvih eksponenata i sl.
-                    String functionName = (fNameNode[0] as TextRunToken).Text;
+                    String functionName = (fNameNode[0] as Lexeme).Value;
                     if (properties.IsFunctionName(functionName))
                     {
                         int nArguments = properties.getFunctionArgumentsCount(functionName);
@@ -554,7 +554,7 @@ namespace OMathParser.Syntax
                 {
                     Lexeme token = input as Lexeme;
                     Lexeme.LexemeType ttype = token.Type;
-                    if (properties.IsConstant(token.Value))
+                    if (properties.IsVariable(token.Value))
                     {
                         VariableIdentifierNode variable = new VariableIdentifierNode(token.Value);
                         operandStack.Push(variable);
@@ -565,7 +565,7 @@ namespace OMathParser.Syntax
                         ConstantIdentifierNode constant = new ConstantIdentifierNode(token.Value, constantValue);
                         operandStack.Push(constant);
                     }
-                    else if (properties.IsFunctionName(operatorStack.Peek().Value))
+                    else if (properties.IsFunctionName(token.Value))
                     {
                         int nArguments = properties.getFunctionArgumentsCount(token.Value);
                         FunctionApplyNode.FunctionBody funcBody = properties.getFunctionDefinition(token.Value);

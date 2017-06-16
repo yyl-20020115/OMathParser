@@ -108,7 +108,7 @@ namespace OMathParser.Tokens
                 }
             }
 
-            return new TokenList(textRunTokenizer.Tokenize(innerText.ToString()));
+            return new TokenList(textRunTokenizer.Tokenize(innerText.ToString(), true));
         }
 
         private FractionToken processFraction(Fraction f)
