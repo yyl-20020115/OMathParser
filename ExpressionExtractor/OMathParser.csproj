@@ -45,8 +45,6 @@
     <Compile Include="Lexical\NumericLiteralMatcher.cs" />
     <Compile Include="Lexical\SubscriptedIdentifierLexeme.cs" />
     <Compile Include="Lexical\Tokenizer.cs" />
-    <Compile Include="Lexical\UndeclaredFunctionName.cs" />
-    <Compile Include="Lexical\UndeclaredIdentifier.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Syntax\ArgumentTokenListParser.cs" />
     <Compile Include="Syntax\BaseOXMLParser.cs" />
