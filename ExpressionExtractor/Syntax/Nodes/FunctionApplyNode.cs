@@ -45,6 +45,25 @@ namespace OMathParser.Syntax.Nodes
             return String.Format("{0}{1}[nArgs:{2}]", arguments, name, this.arguments.Count);
         }
 
+        public override bool Equals(object obj)
+        {
+            FunctionApplyNode other = obj as FunctionApplyNode;
+            if (other != null)
+            {
+                return this.name.Equals(other.name);
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        public override int GetHashCode()
+        {
+            return name.GetHashCode();
+        }
+
+
         public ArgumentListNode Arguments { get => arguments; }
         public int ArgumentsCount { get => arguments.Count; }
     }

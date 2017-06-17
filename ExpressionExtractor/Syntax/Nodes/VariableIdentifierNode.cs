@@ -43,5 +43,23 @@ namespace OMathParser.Syntax.Nodes
         {
             return name;
         }
+
+        public override bool Equals(object obj)
+        {
+            VariableIdentifierNode other = obj as VariableIdentifierNode;
+            if (other != null)
+            {
+                return this.name.Equals(other.name);
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        public override int GetHashCode()
+        {
+            return name.GetHashCode();
+        }
     }
 }

@@ -11,6 +11,7 @@ using OMathParser.Tokens.OXMLTokens;
 using OMathParser.Tokens.OXMLTokens.Abstract;
 using OMathParser.Lexical;
 using System.Globalization;
+using System.Text.RegularExpressions;
 
 namespace OMathParser.Syntax
 {
@@ -208,6 +209,11 @@ namespace OMathParser.Syntax
                 {
                     processed = processRadicalToken(t as RadicalToken);
                 }
+                else if (t is SubscriptToken)
+                {
+                    // TODO : implementiraj za SubscriptedIdentifierLexeme
+                    throw new ParseException("Given token cannot be pushed into the output queue as a value producer.");
+                }
                 else
                 {
                     throw new ParseException("Given token cannot be pushed into the output queue as a value producer.");
@@ -242,10 +248,28 @@ namespace OMathParser.Syntax
                 {
                     return true;
                 }
+                //else if (token is SubscriptToken)
+                //{
+                //    return isSubscriptedIdentifier(token as SubscriptToken);
+                //}
             }
 
             return false;
         }
+
+        //private bool isSubscriptedIdentifier(SubscriptToken t)
+        //{
+        //    TokenList subBase = (token as SubscriptToken).Base;
+        //    TokenList subscript = (token as SubscriptToken).Subscript;
+
+        //    if (subBase.Count == 1 && subBase[0] is TextRunToken)
+        //    {
+        //        String subBaseText = (subBase[0] as TextRunToken).Text;
+        //        if (Regex.Match(subBaseText, )
+        //            }
+        //    // TODO : implementiraj!!!!
+        //    return false;
+        //}
 
         protected bool canProcessTokenAsUnaryOp()
         {

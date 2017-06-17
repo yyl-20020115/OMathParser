@@ -24,13 +24,13 @@ namespace OMathParser.Tokens
         private ParseProperties parseProperties;
         private Tokenizer textRunTokenizer;
 
-        private ISet<string> foundIdentifiers;
+        private ISet<Lexeme> foundIdentifiers;
 
         public TokenTreeBuilder(ParseProperties parseProperties)
         {
             this.parseProperties = parseProperties;
             this.textRunTokenizer = new Tokenizer(parseProperties);
-            this.foundIdentifiers = new HashSet<string>();
+            this.foundIdentifiers = new HashSet<Lexeme>();
         }
 
         public TokenTree build(OfficeMath expression)
@@ -58,7 +58,7 @@ namespace OMathParser.Tokens
                     Lexeme lex = l as Lexeme;
                     if (lex != null && lex.Type == Lexeme.LexemeType.IDENTIFIER)
                     {
-                        foundIdentifiers.Add(lex.Value);
+                        foundIdentifiers.Add(lex);
                     }
                 }
                 return lexemes;

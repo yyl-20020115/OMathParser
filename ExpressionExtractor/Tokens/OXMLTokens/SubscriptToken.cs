@@ -34,5 +34,8 @@ namespace OMathParser.Tokens.OXMLTokens
         {
             return String.Format("Subscript: base=({0}), arg=({1})", subBase.simpleRepresentation(), subArgument.simpleRepresentation());
         }
+
+        public TokenList Base => subBase;
+        public TokenList Subscript => subArgument;
     }
 }
