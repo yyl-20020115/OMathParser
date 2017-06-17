@@ -10,7 +10,7 @@ namespace OMathParser.Tokens.OXMLTokens.Abstract
     {
         protected IToken parent;
 
-        public IToken Parent { get => parent; set => parent = value; }
+        public IToken Parent { get => parent; set => parent = value; } 
 
         public abstract string simpleRepresentation();
     }

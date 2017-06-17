@@ -16,14 +16,17 @@ namespace OMathParser.Syntax
 {
     public class TokenListParser : BaseOXMLParser
     {
-        public TokenListParser(ParseProperties properties, TokenList tokens)
+        public TokenListParser(ParseProperties properties)
             : base(properties)
         {
-            populateInputQueue(tokens);
         }
 
-        private List<ISyntaxUnit> convertToPostfix()
+
+        private List<ISyntaxUnit> convertToPostfix(TokenList tokens)
         {
+            this.reset();
+            populateInputQueue(tokens);
+
             while (true)
             {
                 IToken current;
@@ -59,7 +62,7 @@ namespace OMathParser.Syntax
                 {
                     Lexeme currentLexeme = current as Lexeme;
                     Lexeme.LexemeType type = currentLexeme.Type;
-                    if (type == Lexeme.LexemeType.FUNCTION_NAME)
+                    if (properties.IsFunctionName(currentLexeme.Value))
                     {
                         processFunctionNameLexeme(currentLexeme);
                     }
@@ -112,9 +115,9 @@ namespace OMathParser.Syntax
             }
         }
 
-        public SyntaxNode parse()
+        public SyntaxNode parse(TokenList infix)
         {
-            List<ISyntaxUnit> postfixForm = convertToPostfix();
+            List<ISyntaxUnit> postfixForm = convertToPostfix(infix);
             return buildSyntaxTree(postfixForm);
         }
     }

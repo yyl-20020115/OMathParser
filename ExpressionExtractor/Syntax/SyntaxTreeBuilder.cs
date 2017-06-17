@@ -21,8 +21,8 @@ namespace OMathParser.Syntax
 
         public SyntaxTree Build(TokenTree tokenTree)
         {
-            TokenListParser parser = new TokenListParser(parseProperties, tokenTree.RootTokens);
-            SyntaxNode root = parser.parse();
+            TokenListParser parser = new TokenListParser(parseProperties);
+            SyntaxNode root = parser.parse(tokenTree.RootTokens);
             return new SyntaxTree(root);
         }
     }

@@ -22,17 +22,20 @@ namespace OMathParser.Tokens.OXMLTokens
 
         public void addBaseToken(IToken t)
         {
-            subBase.addToken(t);
+            subBase.Append(t);
         }
 
         public void addSubArgumentToken(IToken t)
         {
-            subArgument.addToken(t);
+            subArgument.Append(t);
         }
 
         public override string simpleRepresentation()
         {
             return String.Format("Subscript: base=({0}), arg=({1})", subBase.simpleRepresentation(), subArgument.simpleRepresentation());
         }
+
+        public TokenList Base => subBase;
+        public TokenList Subscript => subArgument;
     }
 }

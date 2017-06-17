@@ -16,26 +16,42 @@ namespace OMathParser.Syntax
     public class ArgumentTokenListParser : BaseOXMLParser
     {
         private List<SyntaxNode> processedArguments;
-        
-        public ArgumentTokenListParser(ParseProperties properties, TokenList arguments) 
+        private int argumentsNeeded;
+
+        public ArgumentTokenListParser(ParseProperties properties) 
             : base(properties)
         {
             this.processedArguments = new List<SyntaxNode>();
-            populateInputQueue(arguments);
         }
 
-        public ArgumentListNode Parse()
+        new private void reset(int argumentsNeeded)
         {
+            base.reset();
+            processedArguments.Clear();
+            this.argumentsNeeded = argumentsNeeded;
+        }
+
+        public ArgumentListNode Parse(TokenList arguments, int nArguments)
+        {
+            this.reset(nArguments);
+            populateInputQueue(arguments);
+
             constructArguments();
-            if (processedArguments.Count > 0)
+
+            if (processedArguments.Count() < argumentsNeeded)
             {
-                return new ArgumentListNode(processedArguments);
+                throw new ParseException("Too few arguments given for function call.");
+            }
+            else if (processedArguments.Count() > argumentsNeeded)
+            {
+                throw new ParseException("Too many arguments given for function call.");
             }
             else
             {
-                throw new ParseException("Couldn't parse a single argument from given TokenList");
+                return new ArgumentListNode(processedArguments);
             }
         }
+
 
         private void constructArguments()
         {
@@ -53,6 +69,11 @@ namespace OMathParser.Syntax
                         constructSingleArgument();
                     }
 
+                    if (processedArguments.Count() < argumentsNeeded)
+                    {
+                        throw new ParseException("Too few arguments successfully parsed.");
+                    }
+
                     return;
                 }
 
@@ -65,7 +86,7 @@ namespace OMathParser.Syntax
                 {
                     Lexeme currentLexeme = current as Lexeme;
                     Lexeme.LexemeType type = currentLexeme.Type;
-                    if (type == Lexeme.LexemeType.FUNCTION_NAME)
+                    if (properties.IsFunctionName(currentLexeme.Value))
                     {
                         processFunctionNameLexeme(currentLexeme);
                     }
@@ -111,7 +132,7 @@ namespace OMathParser.Syntax
                     }
                     else
                     {
-                        //Lexeme.LexemeType.EQ_SIGN not allowed inside argument list
+                        //Lexeme.LexemeType.EQ_SIGN not allow inside argument list
                         throw new ParseException("Unknown token type encountered in input.");
                     }
                 }
@@ -145,7 +166,7 @@ namespace OMathParser.Syntax
 
                     if (popped.Type == Lexeme.LexemeType.LEFT_PAREN)
                     {
-                        if (operatorStack.Peek().Type != Lexeme.LexemeType.FUNCTION_NAME)
+                        if (!properties.IsFunctionName(operatorStack.Peek().Value))
                         {
                             throw new ParseException("Unexpected function argument separator (',') found.");
                         }
@@ -183,6 +204,11 @@ namespace OMathParser.Syntax
             lastProcessedElement = null;
             SyntaxNode argumentNode = buildSyntaxTree(argumentPostfix);
             processedArguments.Add(argumentNode);
+
+            if (processedArguments.Count == argumentsNeeded && inputCount() > 0)
+            {
+                throw new ParseException("Extra tokens in input after processing all function call arguments.");
+            }
         }
     }
 }

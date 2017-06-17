@@ -128,10 +128,10 @@ namespace OMathParser.Lexical
             acceptableStates.Add(State.FRACTIONAL_ONLY);
             acceptableStates.Add(State.FRACTIONAL_ONLY_DIGITS);
 
-            if (properties.isConstantIdentifierDeclared("e") ||
-                properties.isConstantIdentifierDeclared("E") ||
-                properties.isVariableIdentifierDeclared("e") ||
-                properties.isVariableIdentifierDeclared("E"))
+            if (properties.IsConstant("e") ||
+                properties.IsConstant("E") ||
+                properties.IsVariable("e") ||
+                properties.IsVariable("E"))
             {
                 eIsIndependent = true;
                 exponentSignIsIndependent = true;
@@ -139,8 +139,8 @@ namespace OMathParser.Lexical
                 acceptableStates.Add(State.EXPONENT_SIGN);
             }
 
-            if (properties.isFunctionNameDeclared("e") ||
-                     properties.isFunctionNameDeclared("E"))
+            if (properties.IsFunctionName("e") ||
+                     properties.IsFunctionName("E"))
             {
                 eIsIndependent = true;
                 exponentSignIsIndependent = false;

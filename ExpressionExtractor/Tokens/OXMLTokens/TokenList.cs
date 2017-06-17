@@ -17,16 +17,30 @@ namespace OMathParser.Tokens.OXMLTokens
         public IToken Parent { get => parent; set => parent = value; }
 
         public TokenList() : base() { }
-        public TokenList(IEnumerable<IToken> collection) : base(collection) { }
+        public TokenList(IEnumerable<IToken> collection) 
+            : base()
+        {
+            foreach (var item in collection)
+            {
+                this.Append(item);
+            }
+        }
         public TokenList(Int32 capacity) : base(capacity) { }
 
         
 
-        public void addToken(IToken token)
+        public void Append(IToken token)
         {
             if (token != null)
             {
-                this.Add(token);
+                if (token is TokenList)
+                {
+                    this.AddRange(token as TokenList);
+                }
+                else
+                {
+                    this.Add(token);
+                }
             }
         }
 

@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 using OMathParser.Syntax.Nodes.Abstract;
+using OMathParser.Syntax.Nodes;
 
 namespace OMathParser.Syntax
 {

@@ -43,6 +43,7 @@
   <ItemGroup>
     <Compile Include="Lexical\Lexeme.cs" />
     <Compile Include="Lexical\NumericLiteralMatcher.cs" />
+    <Compile Include="Lexical\SubscriptedIdentifierLexeme.cs" />
     <Compile Include="Lexical\Tokenizer.cs" />
     <Compile Include="Lexical\UndeclaredFunctionName.cs" />
     <Compile Include="Lexical\UndeclaredIdentifier.cs" />

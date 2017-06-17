@@ -20,7 +20,7 @@ namespace OMathParser.Lexical
             this.literalMatcher = new NumericLiteralMatcher(properties);
         }
 
-        public List<Lexeme> Tokenize(String run)
+        public List<Lexeme> Tokenize(String run, bool matchPredefinedIdentifiers)
         {
             List<Lexeme> lexemes = new List<Lexeme>();
 
@@ -81,23 +81,13 @@ namespace OMathParser.Lexical
                 }
                 else
                 {
-                    Lexeme matched = matchFunctionName(run, i);
-                    if (matched != null)
+                    Lexeme matched = matchIdentifierName(run, i);
+                    if (matchPredefinedIdentifiers)
                     {
-                        lexemes.Add(matched);
-                        i += matched.Value.Length;
-                        continue;
+                        // TODO :  
+                        matched = matchDefinedIdentifier(run, i);
                     }
 
-                    matched = matchVariableIdentifier(run, i);
-                    if (matched != null)
-                    {
-                        lexemes.Add(matched);
-                        i += matched.Value.Length;
-                        continue;
-                    }
-
-                    matched = matchConstantIdentifier(run, i);
                     if (matched != null)
                     {
                         lexemes.Add(matched);
@@ -120,66 +110,45 @@ namespace OMathParser.Lexical
             return lexemes;
         }
 
-        private Lexeme matchFunctionName(string input, int startPos)
+        private Lexeme matchDefinedIdentifier(string input, int startPos)
         {
-            HashSet<String> matches = new HashSet<string>();
-            foreach (KeyValuePair<String, int> functionDeclaration in properties.Functions)
+            string inputStart = input.Substring(startPos);
+            foreach (var func in properties.Functions)
             {
-                if (matchesFromPosition(input, startPos, functionDeclaration.Key))
+                if (inputStart.StartsWith(func.Key))
                 {
-                    matches.Add(functionDeclaration.Key);
+                    return new Lexeme(Lexeme.LexemeType.IDENTIFIER, func.Key);
                 }
             }
 
-            if (matches.Count == 0)
+            foreach (var variable in properties.VariableIdentifiers)
             {
-                return null;
+                if (inputStart.StartsWith(variable))
+                {
+                    return new Lexeme(Lexeme.LexemeType.IDENTIFIER, variable);
+                }
             }
-            else
+
+            foreach (var constant in properties.ConstantIdentifiers)
             {
-                return new Lexeme(Lexeme.LexemeType.FUNCTION_NAME, matches.OrderBy(s => s.Length).First());
+                if (inputStart.StartsWith(constant.Key))
+                {
+                    return new Lexeme(Lexeme.LexemeType.IDENTIFIER, constant.Key);
+                }
             }
+
+            return null;
         }
 
-        private Lexeme matchConstantIdentifier(string input, int startPos)
+        private Lexeme matchIdentifierName(string input, int startPos)
         {
-            HashSet<String> matches = new HashSet<string>();
-            foreach (KeyValuePair<String, double> constant in properties.ConstantIdentifiers)
+            if (Char.IsLetter(input[startPos]))
             {
-                if (matchesFromPosition(input, startPos, constant.Key))
-                {
-                    matches.Add(constant.Key);
-                }
-            }
-
-            if (matches.Count == 0)
-            {
-                return null;
+                return new Lexeme(Lexeme.LexemeType.IDENTIFIER, input.Substring(startPos, 1));
             }
             else
             {
-                return new Lexeme(Lexeme.LexemeType.IDENTIFIER_CONST, matches.OrderBy(s => s.Length).First());
-            }
-        }
-
-        private Lexeme matchVariableIdentifier(string input, int startPos)
-        {
-            HashSet<String> matches = new HashSet<string>();
-            foreach (String name in properties.VariableIdentifiers)
-            {
-                if (matchesFromPosition(input, startPos, name))
-                {
-                    matches.Add(name);
-                }
-            }
-
-            if (matches.Count == 0)
-            {
                 return null;
-            }
-            else
-            {
-                return new Lexeme(Lexeme.LexemeType.IDENTIFIER_VAR, matches.OrderBy(s => s.Length).First());
             }
         }
 

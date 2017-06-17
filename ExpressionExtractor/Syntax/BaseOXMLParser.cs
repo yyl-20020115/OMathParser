@@ -11,6 +11,7 @@ using OMathParser.Tokens.OXMLTokens;
 using OMathParser.Tokens.OXMLTokens.Abstract;
 using OMathParser.Lexical;
 using System.Globalization;
+using System.Text.RegularExpressions;
 
 namespace OMathParser.Syntax
 {
@@ -39,6 +40,15 @@ namespace OMathParser.Syntax
             this.openedArgumentLists = 0;
         }
 
+        protected void reset()
+        {
+            input.Clear();
+            output.Clear();
+            operatorStack.Clear();
+            lastProcessedElement = null;
+            openedArgumentLists = 0;
+        }
+
         protected void populateInputQueue(TokenList tokens)
         {
             foreach (IToken t in tokens)
@@ -46,7 +56,7 @@ namespace OMathParser.Syntax
                 if (t is TextRunToken)
                 {
                     String run = (t as TextRunToken).Text;
-                    foreach (IToken lexeme in textRunTokenizer.Tokenize(run))
+                    foreach (IToken lexeme in textRunTokenizer.Tokenize(run, true))
                     {
                         input.Enqueue(lexeme);
                     }
@@ -199,6 +209,11 @@ namespace OMathParser.Syntax
                 {
                     processed = processRadicalToken(t as RadicalToken);
                 }
+                else if (t is SubscriptToken)
+                {
+                    // TODO : implementiraj za SubscriptedIdentifierLexeme
+                    throw new ParseException("Given token cannot be pushed into the output queue as a value producer.");
+                }
                 else
                 {
                     throw new ParseException("Given token cannot be pushed into the output queue as a value producer.");
@@ -220,8 +235,8 @@ namespace OMathParser.Syntax
                 Lexeme l = token as Lexeme;
                 Lexeme.LexemeType t = l.Type;
                 return t == Lexeme.LexemeType.REAL_VALUE ||
-                        t == Lexeme.LexemeType.IDENTIFIER_CONST ||
-                        t == Lexeme.LexemeType.IDENTIFIER_VAR;
+                        properties.IsConstant(l.Value) ||
+                        properties.IsVariable(l.Value);
             }
             else
             {
@@ -233,10 +248,28 @@ namespace OMathParser.Syntax
                 {
                     return true;
                 }
+                //else if (token is SubscriptToken)
+                //{
+                //    return isSubscriptedIdentifier(token as SubscriptToken);
+                //}
             }
 
             return false;
         }
+
+        //private bool isSubscriptedIdentifier(SubscriptToken t)
+        //{
+        //    TokenList subBase = (token as SubscriptToken).Base;
+        //    TokenList subscript = (token as SubscriptToken).Subscript;
+
+        //    if (subBase.Count == 1 && subBase[0] is TextRunToken)
+        //    {
+        //        String subBaseText = (subBase[0] as TextRunToken).Text;
+        //        if (Regex.Match(subBaseText, )
+        //            }
+        //    // TODO : implementiraj!!!!
+        //    return false;
+        //}
 
         protected bool canProcessTokenAsUnaryOp()
         {
@@ -280,11 +313,11 @@ namespace OMathParser.Syntax
                 }
                 return new LiteralNode(value);
             }
-            else if (lt == Lexeme.LexemeType.IDENTIFIER_VAR)
+            else if (properties.IsVariable(lexeme.Value))
             {
                 return new VariableIdentifierNode(lexeme.Value);
             }
-            else if (lt == Lexeme.LexemeType.IDENTIFIER_CONST)
+            else if (properties.IsConstant(lexeme.Value))
             {
                 Double value = properties.getConstantValue(lexeme.Value);
                 return new ConstantIdentifierNode(lexeme.Value, value);
@@ -295,12 +328,10 @@ namespace OMathParser.Syntax
 
         protected DivisionNode processFraction(FractionToken fraction)
         {
-            TokenListParser numeratorParser = new TokenListParser(properties, fraction.Numerator);
-            TokenListParser denominatorParser = new TokenListParser(properties, fraction.Denominator);
-
-            SyntaxNode left = numeratorParser.parse();
-            SyntaxNode right = denominatorParser.parse();
-
+            TokenListParser fractionParser = new TokenListParser(properties);
+            
+            SyntaxNode left = fractionParser.parse(fraction.Numerator);
+            SyntaxNode right = fractionParser.parse(fraction.Denominator);
             return new DivisionNode(left, right);
         }
 
@@ -309,11 +340,11 @@ namespace OMathParser.Syntax
             TokenList fNameNode = func.FunctionName;
             if (fNameNode.Count == 1)
             {
-                if (fNameNode[0] is TextRunToken)
+                if (fNameNode[0] is Lexeme)
                 {
                     // Samo naziv funkcije u fName, bez ikakvih eksponenata i sl.
-                    String functionName = (fNameNode[0] as TextRunToken).Text;
-                    if (properties.isFunctionNameDeclared(functionName))
+                    String functionName = (fNameNode[0] as Lexeme).Value;
+                    if (properties.IsFunctionName(functionName))
                     {
                         int nArguments = properties.getFunctionArgumentsCount(functionName);
                         ArgumentListNode arguments = parseArgumentList(func.Arguments, nArguments);
@@ -336,7 +367,7 @@ namespace OMathParser.Syntax
                     if (sup.Base.Count == 1 && sup.Base[0] is TextRunToken)
                     {
                         String functionName = (sup.Base[0] as TextRunToken).Text;
-                        if (properties.isFunctionNameDeclared(functionName))
+                        if (properties.IsFunctionName(functionName))
                         {
                             int nArguments = properties.getFunctionArgumentsCount(functionName);
                             ArgumentListNode arguments = parseArgumentList(func.Arguments, nArguments);
@@ -348,8 +379,8 @@ namespace OMathParser.Syntax
                                     func.simpleRepresentation());
                             }
 
-                            TokenListParser exponentParser = new TokenListParser(properties, sup.Argument);
-                            SyntaxNode exponentArgument = exponentParser.parse();
+                            TokenListParser exponentParser = new TokenListParser(properties);
+                            SyntaxNode exponentArgument = exponentParser.parse(sup.Argument);
 
                             FunctionApplyNode.FunctionBody definition = properties.getFunctionDefinition(functionName);
                             FunctionApplyNode exponentBase = new FunctionApplyNode(arguments, definition, functionName);
@@ -365,45 +396,41 @@ namespace OMathParser.Syntax
 
         protected SyntaxNode processParenthesesToken(ParenthesesToken parentheses)
         {
-            TokenListParser listParser = new TokenListParser(properties, parentheses.Elements);
-            return listParser.parse();
+            TokenListParser listParser = new TokenListParser(properties);
+            return listParser.parse(parentheses.Elements);
         }
 
         protected PowerNode processSuperscriptToken(SuperscriptToken superscript)
         {
-            TokenListParser baseParser = new TokenListParser(properties, superscript.Base);
-            TokenListParser argumentParser = new TokenListParser(properties, superscript.Argument);
-
-            SyntaxNode baseNode = baseParser.parse();
-            SyntaxNode argumentNode = argumentParser.parse();
+            TokenListParser supParser = new TokenListParser(properties);
+            
+            SyntaxNode baseNode = supParser.parse(superscript.Base);
+            SyntaxNode argumentNode = supParser.parse(superscript.Argument);
 
             return new PowerNode(baseNode, argumentNode);
         }
 
         protected RadicalNode processRadicalToken(RadicalToken radical)
         {
-            TokenListParser baseParser = new TokenListParser(properties, radical.Base);
-            TokenListParser degreeParser = new TokenListParser(properties, radical.Degree);
+            TokenListParser radicalParser = new TokenListParser(properties);
 
-            SyntaxNode baseNode = baseParser.parse();
-            SyntaxNode degreeNode = degreeParser.parse();
+            SyntaxNode baseNode = radicalParser.parse(radical.Base);
+            SyntaxNode degreeNode = radicalParser.parse(radical.Degree);
 
             return new RadicalNode(baseNode, degreeNode);
         }
 
         protected ArgumentListNode parseArgumentList(TokenList argumentList, int argumentsNeeded)
         {
-            ArgumentTokenListParser argumentListParser = 
-                new ArgumentTokenListParser(properties, argumentList);
-            return argumentListParser.Parse();
+            ArgumentTokenListParser argumentListParser = new ArgumentTokenListParser(properties);
+            return argumentListParser.Parse(argumentList, argumentsNeeded);
         }
 
         protected ArgumentListNode parseArgumentList(ParenthesesToken argumentList, int argumentsNeeded)
         {
-            List<SyntaxNode> processedArguments = new List<SyntaxNode>();
-            ArgumentTokenListParser argumentListParser =
-                new ArgumentTokenListParser(properties, argumentList.Elements);
-            return argumentListParser.Parse();
+            //List<SyntaxNode> processedArguments = new List<SyntaxNode>();
+            ArgumentTokenListParser argumentListParser = new ArgumentTokenListParser(properties);
+            return argumentListParser.Parse(argumentList.Elements, argumentsNeeded);
         }
 
         protected ArgumentListNode parseArgumentList(DelimiterToken argumentList)
@@ -417,8 +444,8 @@ namespace OMathParser.Syntax
             ArgumentListNode argumentListNode = new ArgumentListNode();
             foreach (TokenList argument in argumentList.Elements)
             {
-                TokenListParser argumentParser = new TokenListParser(properties, argument);
-                SyntaxNode argumentRootNode = argumentParser.parse();
+                TokenListParser argumentParser = new TokenListParser(properties);
+                SyntaxNode argumentRootNode = argumentParser.parse(argument);
                 argumentListNode.addArgument(argumentRootNode);
             }
 
@@ -479,7 +506,7 @@ namespace OMathParser.Syntax
                     {
                         // Ako je na vrhu stoga ostalo ime funkcije, prebacujemo ga u izlaz
                         IToken stackTop = operatorStack.Peek();
-                        if (stackTop is Lexeme && (stackTop as Lexeme).Type == Lexeme.LexemeType.FUNCTION_NAME)
+                        if (stackTop is Lexeme && properties.IsFunctionName((stackTop as Lexeme).Value))
                         {
                             Lexeme funcName = stackTop as Lexeme;
                             output.Enqueue(funcName);
@@ -523,7 +550,7 @@ namespace OMathParser.Syntax
 
                     if (popped.Type == Lexeme.LexemeType.LEFT_PAREN)
                     {
-                        if (operatorStack.Peek().Type != Lexeme.LexemeType.FUNCTION_NAME)
+                        if (!properties.IsFunctionName(operatorStack.Peek().Value))
                         {
                             throw new ParseException("Unexpected function argument separator (',') found.");
                         }
@@ -551,18 +578,18 @@ namespace OMathParser.Syntax
                 {
                     Lexeme token = input as Lexeme;
                     Lexeme.LexemeType ttype = token.Type;
-                    if (ttype == Lexeme.LexemeType.IDENTIFIER_VAR)
+                    if (properties.IsVariable(token.Value))
                     {
                         VariableIdentifierNode variable = new VariableIdentifierNode(token.Value);
                         operandStack.Push(variable);
                     }
-                    else if (ttype == Lexeme.LexemeType.IDENTIFIER_CONST)
+                    else if (properties.IsConstant(token.Value))
                     {
                         double constantValue = properties.getConstantValue(token.Value);
                         ConstantIdentifierNode constant = new ConstantIdentifierNode(token.Value, constantValue);
                         operandStack.Push(constant);
                     }
-                    else if (ttype == Lexeme.LexemeType.FUNCTION_NAME)
+                    else if (properties.IsFunctionName(token.Value))
                     {
                         int nArguments = properties.getFunctionArgumentsCount(token.Value);
                         FunctionApplyNode.FunctionBody funcBody = properties.getFunctionDefinition(token.Value);

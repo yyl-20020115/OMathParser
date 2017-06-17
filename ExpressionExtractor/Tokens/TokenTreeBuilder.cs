@@ -13,6 +13,7 @@ using Text = DocumentFormat.OpenXml.Math.Text;
 
 using OMathParser.Tokens.OXMLTokens;
 using OMathParser.Tokens.OXMLTokens.Abstract;
+using OMathParser.Lexical;
 using OMathParser.Utils;
 
 
@@ -21,38 +22,46 @@ namespace OMathParser.Tokens
     public class TokenTreeBuilder
     {
         private ParseProperties parseProperties;
-        private IDictionary<String, int> functions;
+        private Tokenizer textRunTokenizer;
+
+        private ISet<Lexeme> foundIdentifiers;
 
         public TokenTreeBuilder(ParseProperties parseProperties)
         {
             this.parseProperties = parseProperties;
-
-            functions = new Dictionary<String, int>();
-            foreach (KeyValuePair<String, int> funcDeclaration in parseProperties.Functions)
-            {
-                this.functions.Add(funcDeclaration.Key, funcDeclaration.Value);
-            }
+            this.textRunTokenizer = new Tokenizer(parseProperties);
+            this.foundIdentifiers = new HashSet<Lexeme>();
         }
 
         public TokenTree build(OfficeMath expression)
         {
+            foundIdentifiers.Clear();
+
             TokenList rootTokens = new TokenList();
 
             foreach (OpenXmlElement element in expression.ChildElements)
             {
                 IToken processedElement = processElement(element);
-                rootTokens.addToken(processedElement);
+                rootTokens.Append(processedElement);
             }
 
-            return new TokenTree(rootTokens);
+            return new TokenTree(rootTokens, foundIdentifiers);
         }
-
 
         private IToken processElement(OpenXmlElement e)
         {
             if (e is Run)
             {
-                return processRun(e as Run);
+                TokenList lexemes = processRun(e as Run);
+                foreach (IToken l in lexemes)
+                {
+                    Lexeme lex = l as Lexeme;
+                    if (lex != null && lex.Type == Lexeme.LexemeType.IDENTIFIER)
+                    {
+                        foundIdentifiers.Add(lex);
+                    }
+                }
+                return lexemes;
             }
             else if (e is Fraction)
             {
@@ -88,7 +97,7 @@ namespace OMathParser.Tokens
             }
         }
 
-        private TextRunToken processRun(Run r)
+        private TokenList processRun(Run r)
         {
             StringBuilder innerText = new StringBuilder();
             foreach (var child in r.ChildElements)
@@ -99,7 +108,7 @@ namespace OMathParser.Tokens
                 }
             }
 
-            return new TextRunToken(innerText.ToString());
+            return new TokenList(textRunTokenizer.Tokenize(innerText.ToString(), true));
         }
 
         private FractionToken processFraction(Fraction f)
@@ -109,12 +118,12 @@ namespace OMathParser.Tokens
 
             foreach (var child in f.Denominator)
             {
-                denominator.addToken(processElement(child));
+                denominator.Append(processElement(child));
             }
 
             foreach (var child in f.Numerator)
             {
-                numerator.addToken(processElement(child));
+                numerator.Append(processElement(child));
             }
 
             return new FractionToken(numerator, denominator);
@@ -127,12 +136,12 @@ namespace OMathParser.Tokens
 
             foreach (var child in s.Base)
             {
-                subBase.addToken(processElement(child));
+                subBase.Append(processElement(child));
             }
 
             foreach (var child in s.SubArgument)
             {
-                argument.addToken(processElement(child));
+                argument.Append(processElement(child));
             }
 
             return new SubscriptToken(subBase, argument);
@@ -145,12 +154,12 @@ namespace OMathParser.Tokens
 
             foreach (var child in s.Base)
             {
-                supBase.addToken(processElement(child));
+                supBase.Append(processElement(child));
             }
 
             foreach (var child in s.SuperArgument)
             {
-                argument.addToken(processElement(child));
+                argument.Append(processElement(child));
             }
 
             return new SuperscriptToken(supBase, argument);
@@ -163,19 +172,19 @@ namespace OMathParser.Tokens
 
             if (!r.Degree.HasChildren)
             {
-                degree.addToken(new TextRunToken("2"));
+                degree.Append(new TextRunToken("2"));
             }
             else
             {
                 foreach (var child in r.Degree)
                 {
-                    degree.addToken(processElement(child));
+                    degree.Append(processElement(child));
                 }
             }
 
             foreach (var child in r.Base)
             {
-                radBase.addToken(processElement(child));
+                radBase.Append(processElement(child));
             }
 
             return new RadicalToken(radBase, degree);
@@ -216,12 +225,12 @@ namespace OMathParser.Tokens
 
             foreach (var child in f.FunctionName)
             {
-                funcName.addToken(processElement(child));
+                funcName.Append(processElement(child));
             }
 
             foreach (var child in f.Base)
             {
-                funcBase.addToken(processElement(child));
+                funcBase.Append(processElement(child));
             }
 
             return new FunctionApplyToken(funcBase, funcName);

@@ -22,12 +22,12 @@ namespace OMathParser.Tokens.OXMLTokens
 
         public void addNummeratorToken(IToken t)
         {
-            numerator.addToken(t);
+            numerator.Append(t);
         }
 
         public void addDenominatorToken(IToken t)
         {
-            denominator.addToken(t);
+            denominator.Append(t);
         }
 
         public override string simpleRepresentation()
