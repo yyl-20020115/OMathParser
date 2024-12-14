@@ -4,8 +4,6 @@ using OMathParser.Tokens;
 using OMathParser.Utils;
 using OMathParser.Syntax;
 using DocumentFormat.OpenXml;
-using DocumentFormat.OpenXml.Math;
-
 
 namespace ConsoleAppTester;
 
@@ -47,19 +45,16 @@ public class Program
         var tokenTreeBuilder = new TokenTreeBuilder(parseProperties);
         var syntaxTreeBuilder = new SyntaxTreeBuilder(parseProperties);
 
-        List<OfficeMath> mathExpressions = new(docBody.Descendants<OfficeMath>());
+        List<OfficeMath> mathExpressions = new(docBody?.Descendants<OfficeMath>() ?? []);
         foreach (var expression in mathExpressions)
         {
-            if (string.IsNullOrWhiteSpace(expression.InnerText))
-            {
-                continue;
-            }
+            if (string.IsNullOrWhiteSpace(expression.InnerText)) continue;
 
             Console.WriteLine("OMath paragraph found!");
             Console.WriteLine(System.Xml.Linq.XDocument.Parse(expression.OuterXml).ToString());
 
-            TokenTree tokenTree = tokenTreeBuilder.Build(expression);
-            SyntaxTree syntaxTree = syntaxTreeBuilder.Build(tokenTree);
+            var tokenTree = tokenTreeBuilder.Build(expression);
+            var syntaxTree = syntaxTreeBuilder.Build(tokenTree);
 
             Console.WriteLine("\nSyntax tree built!");
             Console.WriteLine("Postfix notation: ");
@@ -68,8 +63,6 @@ public class Program
             Console.WriteLine(syntaxTree.ToInfixNotation());
             Console.WriteLine("\n====================================================================\n");
         }
-
-
 
         Console.Read();
     }
