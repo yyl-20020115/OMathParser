@@ -1,5 +1,4 @@
 ﻿using DocumentFormat.OpenXml.Packaging;
-using DocumentFormat.OpenXml.Wordprocessing;
 using OfficeMath = DocumentFormat.OpenXml.Math.OfficeMath;
 using OMathParser.Tokens;
 using OMathParser.Utils;
@@ -12,7 +11,7 @@ public class Program
 {
     static void Main(string[] args)
     {
-        var docPath = @"..\..\proba - Copy.docx";
+        var docPath = @"proba - Copy.docx";
 
         var doc = WordprocessingDocument.Open(docPath, false);
         var docBody = doc.MainDocumentPart?.Document?.Body;

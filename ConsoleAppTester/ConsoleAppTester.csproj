@@ -11,4 +11,10 @@
     <ProjectReference Include="..\OMathParser\OMathParser.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="proba - Copy.docx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

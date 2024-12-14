@@ -6,7 +6,7 @@ namespace OMathParser.Tokens.OXMLTokens;
 
 public class DelimiterToken(char beginChar, char endChar, char delimiter) : AbstractToken
 {
-    private readonly List<IToken> elements = new List<IToken>();
+    private readonly List<IToken> elements = [];
     private readonly char beginChar = beginChar;
     private readonly char endChar = endChar;
     private readonly char delimiter = delimiter;
