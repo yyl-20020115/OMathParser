@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "ConsoleAppTester": {
+      "commandName": "Project",
+      "workingDirectory": "$(ProjectDir)"
+    }
+  }
+}

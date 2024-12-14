@@ -3,6 +3,8 @@ using OfficeMath = DocumentFormat.OpenXml.Math.OfficeMath;
 using OMathParser.Tokens;
 using OMathParser.Utils;
 using OMathParser.Syntax;
+using DocumentFormat.OpenXml;
+using DocumentFormat.OpenXml.Math;
 
 
 namespace ConsoleAppTester;
@@ -11,6 +13,31 @@ public class Program
 {
     static void Main(string[] args)
     {
+        var sup = typeof(OpenXmlCompositeElement);
+        var root = typeof(OfficeMath);
+        var types = new List<Type>();
+        foreach(var vt in root.Assembly.GetTypes())
+        {
+            if (vt.Namespace == "DocumentFormat.OpenXml.Math" && vt.IsSubclassOf(sup))
+            {
+                Console.WriteLine(vt);
+                types.Add(vt);
+            }
+        }
+        Console.WriteLine();
+        Console.WriteLine();
+        Console.WriteLine();
+        Console.WriteLine();
+        using var writer = new StreamWriter("result.txt");
+        foreach (var vt in types)
+        {
+            writer.WriteLine($"public XElement? Convert({vt.Name}? element)");
+            writer.WriteLine("{");
+            writer.WriteLine("  return null;");
+            writer.WriteLine("}");
+        }
+        writer.Close();
+
         var docPath = @"proba - Copy.docx";
 
         var doc = WordprocessingDocument.Open(docPath, false);
