@@ -1,33 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using OMathParser.Tokens.OXMLTokens.Abstract;
 
-using OMathParser.Tokens.OXMLTokens.Abstract;
+namespace OMathParser.Tokens.OXMLTokens;
 
-namespace OMathParser.Tokens.OXMLTokens
+public class ParenthesesToken(char beginChar, char endChar, IEnumerable<IToken> elements) : AbstractToken
 {
-    public class ParenthesesToken : AbstractToken
-    {
-        private TokenList elements;
-        private char beginChar;
-        private char endChar;
+    private readonly TokenList elements = new TokenList(elements);
+    private readonly char beginChar = beginChar;
+    private readonly char endChar = endChar;
 
-        public ParenthesesToken(char beginChar, char endChar, IEnumerable<IToken> elements)
-        {
-            this.beginChar = beginChar;
-            this.endChar = endChar;
-            this.elements = new TokenList(elements);
-        }
+    public override string SimpleRepresentation => $"Parentheses: ({elements.SimpleRepresentation})";
 
-        public override string SimpleRepresentation()
-        {
-            return String.Format("Parentheses: ({0})", elements.SimpleRepresentation());
-        }
-
-        public char BeginChar { get => this.beginChar; }
-        public char EndChar { get => this.endChar; }
-        public TokenList Elements { get => elements; }
-    }
+    public char BeginChar => this.beginChar;
+    public char EndChar => this.endChar;
+    public TokenList Elements => elements;
 }

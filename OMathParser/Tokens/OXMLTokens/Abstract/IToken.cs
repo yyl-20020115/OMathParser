@@ -1,15 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using OMathParser.Utils;
 
-using OMathParser.Utils;
+namespace OMathParser.Tokens.OXMLTokens.Abstract;
 
-namespace OMathParser.Tokens.OXMLTokens.Abstract
+public interface IToken : ISimplifiable
 {
-    public interface IToken : ISimplifiable
-    {
-        IToken Parent { get ; set; }
-    }
+    IToken? Parent { get ; set; }
 }

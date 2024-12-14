@@ -1,33 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using OMathParser.Syntax.Nodes.Abstract;
 
-using OMathParser.Syntax.Nodes.Abstract;
-using OMathParser.Syntax.Nodes;
+namespace OMathParser.Syntax;
 
-namespace OMathParser.Syntax
+public class SyntaxTree(SyntaxNode root)
 {
-    public class SyntaxTree
-    {
-        private SyntaxNode root;
+    private readonly SyntaxNode root = root;
 
-        public SyntaxTree(SyntaxNode root)
-        {
-            this.root = root;
-        }
+    public string ToInfixNotation() => root.ToInfixNotation();
 
-        public string toInfixNotation()
-        {
-            return root.toInfixNotation();
-        }
+    public string ToPostfixNotation() => root.ToPostfixNotation();
 
-        public string toPostfixNotation()
-        {
-            return root.toPostfixNotation();
-        }
-
-        public SyntaxNode RootNode { get => root; }
-    }
+    public SyntaxNode RootNode => root;
 }

@@ -1,65 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using OMathParser.Syntax.Nodes.Abstract;
 
-using OMathParser.Syntax.Nodes.Abstract;
+namespace OMathParser.Syntax.Nodes;
 
-namespace OMathParser.Syntax.Nodes
+public class ConstantIdentifierNode(string name, double value) : SyntaxNode
 {
-    public class ConstantIdentifierNode : SyntaxNode
-    {
-        private string name;
-        private double value;
+    private string name = name;
+    private double value = value;
 
-        public ConstantIdentifierNode(string name, double value)
-        {
-            this.name = name;
-            this.value = value;
-        }
+    public override double Value => value;
 
-        public override double getValue()
-        {
-            return value;
-        }
+    public string Name => name;
 
-        public string getName()
-        {
-            return name;
-        }
+    public override string SimpleRepresentation => $"ConstantIdentifier: {name}={value.ToString()}";
 
-        public override string SimpleRepresentation()
-        {
-            return string.Format("ConstantIdentifier: {0}={1}", name, value.ToString());
-        }
+    public override string ToInfixNotation() => name;
 
-        public override string toInfixNotation()
-        {
-            return name;
-        }
+    public override string ToPostfixNotation() => name;
 
-        public override string toPostfixNotation()
-        {
-            return name;
-        }
+    public override bool Equals(object? obj) => obj is ConstantIdentifierNode other && this.name.Equals(other.name);
 
-        public override bool Equals(object obj)
-        {
-            ConstantIdentifierNode other = obj as ConstantIdentifierNode;
-            if (other != null)
-            {
-                return this.name.Equals(other.name);
-            }
-            else
-            {
-                return false;
-            }
-        }
-
-        public override int GetHashCode()
-        {
-            return name.GetHashCode();
-        }
-    }
+    public override int GetHashCode() => name.GetHashCode();
 }

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text;
 
 using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Math;
@@ -17,223 +13,214 @@ using OMathParser.Lexical;
 using OMathParser.Utils;
 
 
-namespace OMathParser.Tokens
+namespace OMathParser.Tokens;
+
+public class TokenTreeBuilder(ParseProperties parseProperties)
 {
-    public class TokenTreeBuilder
+    private readonly ParseProperties parseProperties = parseProperties;
+    private readonly Tokenizer textRunTokenizer = new (parseProperties);
+
+    private readonly ISet<Lexeme> foundIdentifiers = new HashSet<Lexeme>();
+
+    public TokenTree Build(OfficeMath expression)
     {
-        private ParseProperties parseProperties;
-        private Tokenizer textRunTokenizer;
+        foundIdentifiers.Clear();
 
-        private ISet<Lexeme> foundIdentifiers;
+        TokenList rootTokens = [];
 
-        public TokenTreeBuilder(ParseProperties parseProperties)
+        foreach (OpenXmlElement element in expression.ChildElements)
         {
-            this.parseProperties = parseProperties;
-            this.textRunTokenizer = new Tokenizer(parseProperties);
-            this.foundIdentifiers = new HashSet<Lexeme>();
+            IToken processedElement = ProcessElement(element);
+            rootTokens.Append(processedElement);
         }
 
-        public TokenTree build(OfficeMath expression)
+        return new TokenTree(rootTokens, foundIdentifiers);
+    }
+
+    private IToken ProcessElement(OpenXmlElement e)
+    {
+        if (e is Run)
         {
-            foundIdentifiers.Clear();
-
-            TokenList rootTokens = new TokenList();
-
-            foreach (OpenXmlElement element in expression.ChildElements)
+            TokenList lexemes = ProcessRun(e as Run);
+            foreach (IToken l in lexemes)
             {
-                IToken processedElement = processElement(element);
-                rootTokens.Append(processedElement);
-            }
-
-            return new TokenTree(rootTokens, foundIdentifiers);
-        }
-
-        private IToken processElement(OpenXmlElement e)
-        {
-            if (e is Run)
-            {
-                TokenList lexemes = processRun(e as Run);
-                foreach (IToken l in lexemes)
+                if (l is Lexeme lex && lex.Type == Lexeme.LexemeType.IDENTIFIER)
                 {
-                    Lexeme lex = l as Lexeme;
-                    if (lex != null && lex.Type == Lexeme.LexemeType.IDENTIFIER)
-                    {
-                        foundIdentifiers.Add(lex);
-                    }
-                }
-                return lexemes;
-            }
-            else if (e is Fraction)
-            {
-                return processFraction(e as Fraction);
-            }
-            else if (e is Subscript)
-            {
-                return processSubScript(e as Subscript);
-            }
-            else if (e is Superscript)
-            {
-                return processSupScript(e as Superscript);
-            }
-            else if (e is Radical)
-            {
-                return processRadical(e as Radical);
-            }
-            else if (e is Delimiter)
-            {
-                return processDelimiter(e as Delimiter);
-            }
-            else if (e is MathFunction)
-            {
-                return processMathFunction(e as MathFunction);
-            }
-            else if (e is BookmarkStart || e is BookmarkEnd)
-            {
-                return null;
-            }
-            else
-            {
-                throw new NotImplementedException("No handler implemented for " + e.GetType().FullName);
-            }
-        }
-
-        private TokenList processRun(Run r)
-        {
-            StringBuilder innerText = new StringBuilder();
-            foreach (var child in r.ChildElements)
-            {
-                if (child is Text)
-                {
-                    innerText.Append(((Text)child).Text);
+                    foundIdentifiers.Add(lex);
                 }
             }
-
-            return new TokenList(textRunTokenizer.Tokenize(innerText.ToString(), true));
+            return lexemes;
         }
-
-        private FractionToken processFraction(Fraction f)
+        else if (e is Fraction)
         {
-            TokenList denominator = new TokenList();
-            TokenList numerator = new TokenList();
-
-            foreach (var child in f.Denominator)
-            {
-                denominator.Append(processElement(child));
-            }
-
-            foreach (var child in f.Numerator)
-            {
-                numerator.Append(processElement(child));
-            }
-
-            return new FractionToken(numerator, denominator);
+            return ProcessFraction(e as Fraction);
         }
-
-        private SubscriptToken processSubScript(Subscript s)
+        else if (e is Subscript)
         {
-            TokenList subBase = new TokenList();
-            TokenList argument = new TokenList();
-
-            foreach (var child in s.Base)
-            {
-                subBase.Append(processElement(child));
-            }
-
-            foreach (var child in s.SubArgument)
-            {
-                argument.Append(processElement(child));
-            }
-
-            return new SubscriptToken(subBase, argument);
+            return ProcessSubScript(e as Subscript);
         }
-
-        private SuperscriptToken processSupScript(Superscript s)
+        else if (e is Superscript)
         {
-            TokenList supBase = new TokenList();
-            TokenList argument = new TokenList();
-
-            foreach (var child in s.Base)
-            {
-                supBase.Append(processElement(child));
-            }
-
-            foreach (var child in s.SuperArgument)
-            {
-                argument.Append(processElement(child));
-            }
-
-            return new SuperscriptToken(supBase, argument);
+            return ProcessSupScript(e as Superscript);
         }
-
-        private RadicalToken processRadical(Radical r)
+        else if (e is Radical)
         {
-            TokenList degree = new TokenList();
-            TokenList radBase = new TokenList();
-
-            if (!r.Degree.HasChildren)
-            {
-                degree.Append(new TextRunToken("2"));
-            }
-            else
-            {
-                foreach (var child in r.Degree)
-                {
-                    degree.Append(processElement(child));
-                }
-            }
-
-            foreach (var child in r.Base)
-            {
-                radBase.Append(processElement(child));
-            }
-
-            return new RadicalToken(radBase, degree);
+            return ProcessRadical(e as Radical);
         }
-
-        private IToken processDelimiter(Delimiter d)
+        else if (e is Delimiter)
         {
-            DelimiterProperties dp = d.DelimiterProperties;
-            char beginChar = dp.BeginChar == null ? '(' : dp.BeginChar.Val.ToString().Trim().ElementAt(0);
-            char endChar = dp.EndChar == null ? ')' : dp.EndChar.Val.ToString().Trim().ElementAt(0);
-
-            var delimiterElements = d.Elements<Base>();
-            if (delimiterElements.Count() > 1)
-            {
-                char separator = dp.SeparatorChar == null ? '|' : dp.SeparatorChar.Val.ToString().Trim().ElementAt(0);
-                DelimiterToken delimiterToken = new DelimiterToken(beginChar, endChar, separator);
-
-                foreach (var element in delimiterElements)
-                {
-                    var processedElement = processElement(element);
-                    delimiterToken.AddElement(processedElement);
-                }
-
-                return delimiterToken;
-            }
-            else
-            {
-                var children = from child in delimiterElements.First() select processElement(child);
-
-                return new ParenthesesToken(beginChar, endChar, new TokenList(children));
-            }
+            return ProcessDelimiter(e as Delimiter);
         }
-
-        private IToken processMathFunction(MathFunction f)
+        else if (e is MathFunction)
         {
-            TokenList funcName = new TokenList();
-            TokenList funcBase = new TokenList();
-
-            foreach (var child in f.FunctionName)
-            {
-                funcName.Append(processElement(child));
-            }
-
-            foreach (var child in f.Base)
-            {
-                funcBase.Append(processElement(child));
-            }
-
-            return new FunctionApplyToken(funcBase, funcName);
+            return ProcessMathFunction(e as MathFunction);
         }
+        else if (e is BookmarkStart || e is BookmarkEnd)
+        {
+            return null;
+        }
+        else
+        {
+            throw new NotImplementedException("No handler implemented for " + e.GetType().FullName);
+        }
+    }
+
+    private TokenList ProcessRun(Run r)
+    {
+        var innerText = new StringBuilder();
+        foreach (var child in r.ChildElements)
+        {
+            if (child is Text text)
+            {
+                innerText.Append(text.Text);
+            }
+        }
+
+        return new TokenList(textRunTokenizer.Tokenize(innerText.ToString(), true));
+    }
+
+    private FractionToken ProcessFraction(Fraction f)
+    {
+        TokenList denominator = [];
+        TokenList numerator = [];
+
+        foreach (var child in f.Denominator)
+        {
+            denominator.Append(ProcessElement(child));
+        }
+
+        foreach (var child in f.Numerator)
+        {
+            numerator.Append(ProcessElement(child));
+        }
+
+        return new FractionToken(numerator, denominator);
+    }
+
+    private SubscriptToken ProcessSubScript(Subscript s)
+    {
+        TokenList subBase = [];
+        TokenList argument = [];
+
+        foreach (var child in s.Base)
+        {
+            subBase.Append(ProcessElement(child));
+        }
+
+        foreach (var child in s.SubArgument)
+        {
+            argument.Append(ProcessElement(child));
+        }
+
+        return new SubscriptToken(subBase, argument);
+    }
+
+    private SuperscriptToken ProcessSupScript(Superscript s)
+    {
+        TokenList supBase = [];
+        TokenList argument = [];
+
+        foreach (var child in s.Base)
+        {
+            supBase.Append(ProcessElement(child));
+        }
+
+        foreach (var child in s.SuperArgument)
+        {
+            argument.Append(ProcessElement(child));
+        }
+
+        return new SuperscriptToken(supBase, argument);
+    }
+
+    private RadicalToken ProcessRadical(Radical r)
+    {
+        TokenList degree = [];
+        TokenList radBase = [];
+
+        if (!r.Degree.HasChildren)
+        {
+            degree.Append(new TextRunToken("2"));
+        }
+        else
+        {
+            foreach (var child in r.Degree)
+            {
+                degree.Append(ProcessElement(child));
+            }
+        }
+
+        foreach (var child in r.Base)
+        {
+            radBase.Append(ProcessElement(child));
+        }
+
+        return new RadicalToken(radBase, degree);
+    }
+
+    private IToken ProcessDelimiter(Delimiter d)
+    {
+        DelimiterProperties dp = d.DelimiterProperties;
+        char beginChar = dp.BeginChar == null ? '(' : dp.BeginChar.Val.ToString().Trim().ElementAt(0);
+        char endChar = dp.EndChar == null ? ')' : dp.EndChar.Val.ToString().Trim().ElementAt(0);
+
+        var delimiterElements = d.Elements<Base>();
+        if (delimiterElements.Count() > 1)
+        {
+            char separator = dp.SeparatorChar == null ? '|' : dp.SeparatorChar.Val.ToString().Trim().ElementAt(0);
+            DelimiterToken delimiterToken = new DelimiterToken(beginChar, endChar, separator);
+
+            foreach (var element in delimiterElements)
+            {
+                var processedElement = ProcessElement(element);
+                delimiterToken.AddElement(processedElement);
+            }
+
+            return delimiterToken;
+        }
+        else
+        {
+            var children = from child in delimiterElements.First() select ProcessElement(child);
+
+            return new ParenthesesToken(beginChar, endChar, new TokenList(children));
+        }
+    }
+
+    private IToken ProcessMathFunction(MathFunction f)
+    {
+        TokenList funcName = [];
+        TokenList funcBase = [];
+
+        foreach (var child in f.FunctionName)
+        {
+            funcName.Append(ProcessElement(child));
+        }
+
+        foreach (var child in f.Base)
+        {
+            funcBase.Append(ProcessElement(child));
+        }
+
+        return new FunctionApplyToken(funcBase, funcName);
     }
 }

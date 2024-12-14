@@ -1,24 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace OMathParser.Lexical;
 
-namespace OMathParser.Lexical
+public class SubscriptedIdentifierLexeme(string name, string subscript) : Lexeme(LexemeType.IDENTIFIER, name + "_" + subscript)
 {
-    public class SubscriptedIdentifierLexeme : Lexeme
-    {
-        private string name;
-        private string subscript;
+    private readonly string name = name;
+    private readonly string subscript = subscript;
 
-        public SubscriptedIdentifierLexeme(string name, string subscript) 
-            : base(LexemeType.IDENTIFIER, name + "_" + subscript)
-        {
-            this.name = name;
-            this.subscript = subscript;
-        }
-
-        public string Name => name;
-        public string Subscript => subscript;
-    }
+    public string Name => name;
+    public string Subscript => subscript;
 }

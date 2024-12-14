@@ -1,65 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using OMathParser.Syntax.Nodes.Abstract;
 
-using OMathParser.Syntax.Nodes.Abstract;
+namespace OMathParser.Syntax.Nodes;
 
-namespace OMathParser.Syntax.Nodes
+public class VariableIdentifierNode(string name) : SyntaxNode
 {
-    public class VariableIdentifierNode : SyntaxNode
-    {
-        private double value;
-        private String name;
+    private double value = 0;
+    private readonly string name = name;
 
-        public VariableIdentifierNode(String name)
-        {
-            this.name = name;
-            this.value = 0;
-        }
+    public override double Value => value;
 
-        public override double getValue()
-        {
-            return value;
-        }
+    public void SetValue(double value) => this.value = value;
 
-        public void setValue(double value)
-        {
-            this.value = value;
-        }
+    public override string SimpleRepresentation => "VariableIdentifier: " + name;
 
-        public override string SimpleRepresentation()
-        {
-            return "VariableIdentifier: " + name;
-        }
+    public override string ToInfixNotation() => name;
 
-        public override string toInfixNotation()
-        {
-            return name;
-        }
+    public override string ToPostfixNotation() => name;
 
-        public override string toPostfixNotation()
-        {
-            return name;
-        }
+    public override bool Equals(object? obj) 
+        => obj is VariableIdentifierNode other && this.name.Equals(other.name);
 
-        public override bool Equals(object obj)
-        {
-            VariableIdentifierNode other = obj as VariableIdentifierNode;
-            if (other != null)
-            {
-                return this.name.Equals(other.name);
-            }
-            else
-            {
-                return false;
-            }
-        }
-
-        public override int GetHashCode()
-        {
-            return name.GetHashCode();
-        }
-    }
+    public override int GetHashCode() => name.GetHashCode();
 }

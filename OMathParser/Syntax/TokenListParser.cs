@@ -1,124 +1,109 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using OMathParser.Utils;
+﻿using OMathParser.Utils;
 using OMathParser.Syntax.Nodes.Abstract;
-using OMathParser.Syntax.Nodes;
 using OMathParser.Tokens.OXMLTokens;
 using OMathParser.Tokens.OXMLTokens.Abstract;
 using OMathParser.Lexical;
-using System.Globalization;
 
-namespace OMathParser.Syntax
+namespace OMathParser.Syntax;
+
+public class TokenListParser(ParseProperties properties) : BaseOXMLParser(properties)
 {
-    public class TokenListParser : BaseOXMLParser
+    private List<ISyntaxUnit> ConvertToPostfix(TokenList tokens)
     {
-        public TokenListParser(ParseProperties properties)
-            : base(properties)
+        this.Reset();
+        PopulateInputQueue(tokens);
+
+        while (true)
         {
-        }
+            IToken current;
 
-
-        private List<ISyntaxUnit> convertToPostfix(TokenList tokens)
-        {
-            this.reset();
-            populateInputQueue(tokens);
-
-            while (true)
+            if (CanAddImplicitMultiplication())
             {
-                IToken current;
-
-                if (canAddImplicitMultiplication())
+                current = new Lexeme(Lexeme.LexemeType.OP_MUL, "*");
+            }
+            else
+            {
+                try
                 {
-                    current = new Lexeme(Lexeme.LexemeType.OP_MUL, "*");
+                    current = PollNextInput();
                 }
-                else
+                catch (InvalidOperationException ex)
                 {
-                    try
+                    while (operatorStack.Count > 0)
                     {
-                        current = pollNextInput();
+                        Lexeme op = operatorStack.Pop();
+                        output.Enqueue(op);
                     }
-                    catch (InvalidOperationException ex)
-                    {
-                        while (operatorStack.Count > 0)
-                        {
-                            Lexeme op = operatorStack.Pop();
-                            output.Enqueue(op);
-                        }
 
-                        return new List<ISyntaxUnit>(output);
-                    }
+                    return new List<ISyntaxUnit>(output);
                 }
+            }
 
-                if (canProduceValue(current))
+            if (CanProduceValue(current))
+            {
+                // LexemeTypes: REAL_VALUE, IDENTIFIER_CONST and IDENTIFIER_VAR are processed here
+                PushValueProducerToOutput(current);
+            }
+            else if (current is Lexeme)
+            {
+                Lexeme currentLexeme = current as Lexeme;
+                Lexeme.LexemeType type = currentLexeme.Type;
+                if (properties.IsFunctionName(currentLexeme.Value))
                 {
-                    // LexemeTypes: REAL_VALUE, IDENTIFIER_CONST and IDENTIFIER_VAR are processed here
-                    pushValueProducerToOutput(current);
+                    ProcessFunctionNameLexeme(currentLexeme);
                 }
-                else if (current is Lexeme)
+                else if (type == Lexeme.LexemeType.LEFT_PAREN)
                 {
-                    Lexeme currentLexeme = current as Lexeme;
-                    Lexeme.LexemeType type = currentLexeme.Type;
-                    if (properties.IsFunctionName(currentLexeme.Value))
+                    operatorStack.Push(currentLexeme);
+                }
+                else if (type == Lexeme.LexemeType.RIGHT_PAREN)
+                {
+                    ProcessRightParenthesisLexeme(currentLexeme);
+                }
+                else if (type == Lexeme.LexemeType.OP_PLUS)
+                {
+                    if (CanProcessTokenAsUnaryOp())
                     {
-                        processFunctionNameLexeme(currentLexeme);
-                    }
-                    else if (type == Lexeme.LexemeType.LEFT_PAREN)
-                    {
-                        operatorStack.Push(currentLexeme);
-                    }
-                    else if (type == Lexeme.LexemeType.RIGHT_PAREN)
-                    {
-                        processRightParenthesisLexeme(currentLexeme);
-                    }
-                    else if (type == Lexeme.LexemeType.OP_PLUS)
-                    {
-                        if (canProcessTokenAsUnaryOp())
-                        {
-                            pushOperator(new Lexeme(Lexeme.LexemeType.OP_PLUS_UNARY, "+"));
-                        }
-                        else
-                        {
-                            pushOperator(currentLexeme);
-                        }
-                    }
-                    else if (type == Lexeme.LexemeType.OP_MINUS)
-                    {
-                        if (canProcessTokenAsUnaryOp())
-                        {
-                            pushOperator(new Lexeme(Lexeme.LexemeType.OP_MINUS_UNARY, "-"));
-                        }
-                        else
-                        {
-                            pushOperator(currentLexeme);
-                        }
-                    }
-                    else if (type == Lexeme.LexemeType.OP_MUL ||
-                             type == Lexeme.LexemeType.OP_DIV ||
-                             type == Lexeme.LexemeType.OP_POW ||
-                             type == Lexeme.LexemeType.EQ_SIGN)
-                    {
-                        pushOperator(currentLexeme);
-                    }
-                    else if (type == Lexeme.LexemeType.ARGUMENT_SEPARATOR)
-                    {
-                        processArgumentSeparator();
+                        PushOperator(new Lexeme(Lexeme.LexemeType.OP_PLUS_UNARY, "+"));
                     }
                     else
                     {
-                        throw new ParseException("Unknown token type encountered in input.");
+                        PushOperator(currentLexeme);
                     }
+                }
+                else if (type == Lexeme.LexemeType.OP_MINUS)
+                {
+                    if (CanProcessTokenAsUnaryOp())
+                    {
+                        PushOperator(new Lexeme(Lexeme.LexemeType.OP_MINUS_UNARY, "-"));
+                    }
+                    else
+                    {
+                        PushOperator(currentLexeme);
+                    }
+                }
+                else if (type == Lexeme.LexemeType.OP_MUL ||
+                         type == Lexeme.LexemeType.OP_DIV ||
+                         type == Lexeme.LexemeType.OP_POW ||
+                         type == Lexeme.LexemeType.EQ_SIGN)
+                {
+                    PushOperator(currentLexeme);
+                }
+                else if (type == Lexeme.LexemeType.ARGUMENT_SEPARATOR)
+                {
+                    ProcessArgumentSeparator();
+                }
+                else
+                {
+                    throw new ParseException("Unknown token type encountered in input.");
                 }
             }
         }
+    }
 
-        public SyntaxNode parse(TokenList infix)
-        {
-            List<ISyntaxUnit> postfixForm = convertToPostfix(infix);
-            return buildSyntaxTree(postfixForm);
-        }
+    public SyntaxNode Parse(TokenList infix)
+    {
+        List<ISyntaxUnit> postfixForm = ConvertToPostfix(infix);
+        return BuildSyntaxTree(postfixForm);
     }
 }

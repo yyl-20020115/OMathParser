@@ -1,29 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace OMathParser.Utils;
 
-namespace OMathParser.Utils
+public class LexicalException(string source, int position) : Exception("Cannot tokenize characters from index " + position + " in run: " + source)
 {
-    public class LexicalException : Exception
+    public string SourceRun
     {
-        public LexicalException(String source, int position)
-            : base("Cannot tokenize characters from index " + position + " in run: " + source)
-        {
-            SourceRun = source;
-            Position = position;
-        }
+        get;
+    } = source;
 
-        public String SourceRun
-        {
-            get;
-        }
+    public int Position
+    {
+        get;
+    } = position;
 
-        public int Position
-        {
-            get;
-        }
-
-    }
 }

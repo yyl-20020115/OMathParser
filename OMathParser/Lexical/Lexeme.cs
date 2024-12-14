@@ -80,7 +80,7 @@ public class Lexeme : ISimplifiable, ISyntaxUnit, IToken
 
     public LexemeType Type { get => type; set => type = value; }
     public string Value { get => value; set => this.value = value; }
-    public IToken Parent { get => null; set => this.parent = value; }
+    public IToken? Parent { get => null; set => this.parent = value; }
 
     public bool IsOperator => this.isOperator;
 
@@ -92,7 +92,7 @@ public class Lexeme : ISimplifiable, ISyntaxUnit, IToken
 
     public bool IsRightAssociative() => this.rightAssociative;
 
-    public string SimpleRepresentation() => $"[Lexeme {type.ToString()} {value}]";
+    public string SimpleRepresentation => $"[Lexeme {type.ToString()} {value}]";
 
-    public override string ToString() => SimpleRepresentation();
+    public override string ToString() => SimpleRepresentation;
 }

@@ -32,14 +32,14 @@ public class Program
             Console.WriteLine("OMath paragraph found!");
             Console.WriteLine(System.Xml.Linq.XDocument.Parse(expression.OuterXml).ToString());
 
-            TokenTree tokenTree = tokenTreeBuilder.build(expression);
+            TokenTree tokenTree = tokenTreeBuilder.Build(expression);
             SyntaxTree syntaxTree = syntaxTreeBuilder.Build(tokenTree);
 
             Console.WriteLine("\nSyntax tree built!");
             Console.WriteLine("Postfix notation: ");
-            Console.WriteLine(syntaxTree.toPostfixNotation());
+            Console.WriteLine(syntaxTree.ToPostfixNotation());
             Console.WriteLine("Infix notation: ");
-            Console.WriteLine(syntaxTree.toInfixNotation());
+            Console.WriteLine(syntaxTree.ToInfixNotation());
             Console.WriteLine("\n====================================================================\n");
         }
 

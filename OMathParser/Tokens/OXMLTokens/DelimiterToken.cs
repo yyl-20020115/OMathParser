@@ -1,54 +1,41 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text;
 
 using OMathParser.Tokens.OXMLTokens.Abstract;
 
-namespace OMathParser.Tokens.OXMLTokens
+namespace OMathParser.Tokens.OXMLTokens;
+
+public class DelimiterToken(char beginChar, char endChar, char delimiter) : AbstractToken
 {
-    public class DelimiterToken : AbstractToken
+    private readonly List<IToken> elements = new List<IToken>();
+    private readonly char beginChar = beginChar;
+    private readonly char endChar = endChar;
+    private readonly char delimiter = delimiter;
+
+    public void AddElement(IToken element) => this.elements.Add(element);
+
+    public char BeginChar => this.beginChar;
+    public char EndChar => this.endChar;
+    public char Delimiter => this.delimiter;
+    public List<IToken> Elements => this.elements;
+
+    public override string SimpleRepresentation
     {
-        private List<IToken> elements;
-        private char beginChar;
-        private char endChar;
-        private char delimiter;
-
-        public DelimiterToken(char beginChar, char endChar, char delimiter)
+        get
         {
-            this.beginChar = beginChar;
-            this.endChar = endChar;
-            this.delimiter = delimiter;
-            this.elements = new List<IToken>();
-        }
-
-        public void AddElement(IToken element)
-        {
-            this.elements.Add(element);
-        }
-
-        public char BeginChar { get => this.beginChar; }
-        public char EndChar { get => this.endChar; }
-        public char Delimiter { get => this.delimiter; }
-        public List<IToken> Elements { get => this.elements; }
-
-        public override string SimpleRepresentation()
-        {
-            StringBuilder sb = new StringBuilder();
+            var builder = new StringBuilder();
             foreach (IToken t in elements)
             {
-                sb.Append(t.SimpleRepresentation());
-                sb.Append(this.delimiter);
-                sb.Append(' ');
+                builder.Append(t.SimpleRepresentation);
+                builder.Append(this.delimiter);
+                builder.Append(' ');
             }
 
             if (elements.Count > 1)
             {
-                sb.Remove(sb.Length - 2, 2);
+                builder.Remove(builder.Length - 2, 2);
             }
 
-            return string.Format("Delimiter: {0}{1}{2}", beginChar, sb.ToString(), endChar);
+            return $"Delimiter: {beginChar}{builder}{endChar}";
         }
     }
 }

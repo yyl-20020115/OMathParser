@@ -1,39 +1,26 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace OMathParser.Syntax.Nodes.Abstract;
 
-namespace OMathParser.Syntax.Nodes.Abstract
+public abstract class UnaryNode(SyntaxNode child) : SyntaxNode()
 {
-    public abstract class UnaryNode : SyntaxNode
+    protected SyntaxNode child = child;
+
+    protected string ToInfixNotation(string operatorString)
     {
-        protected SyntaxNode child;
+        var child = this.child.ToInfixNotation();
 
-        public UnaryNode(SyntaxNode child)
-            : base()
+        if (!(this.child is ConstantIdentifierNode ||
+                this.child is LiteralNode ||
+                this.child is VariableIdentifierNode))
         {
-            this.child = child;
+            child = $"({child})";
         }
 
-        protected string toInfixNotation(String operatorString)
-        {
-            String child = this.child.toInfixNotation();
+        return $"[u{operatorString}]{child}";
+    }
 
-            if (!(this.child is ConstantIdentifierNode ||
-                    this.child is LiteralNode ||
-                    this.child is VariableIdentifierNode))
-            {
-                child = "(" + child + ")";
-            }
-
-            return String.Format("[u{0}]{1}", operatorString, child);
-        }
-
-        protected string toPostfixNotation(String operatorString)
-        {
-            String child = this.child.toPostfixNotation();
-            return String.Format("{0} [{1}u]", child, operatorString);
-        }
+    protected string ToPostfixNotation(string operatorString)
+    {
+        var child = this.child.ToPostfixNotation();
+        return $"{child} [{operatorString}u]";
     }
 }

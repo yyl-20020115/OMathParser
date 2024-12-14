@@ -1,28 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using OMathParser.Utils;
 
-using OMathParser.Utils;
+namespace OMathParser.Syntax.Nodes.Abstract;
 
-namespace OMathParser.Syntax.Nodes.Abstract
+public abstract class SyntaxNode : ISimplifiable, ISyntaxUnit
 {
-    public abstract class SyntaxNode : ISimplifiable, ISyntaxUnit
-    {
-        protected SyntaxNode parent;
+    protected SyntaxNode? parent;
 
-        public abstract double getValue();
-        public abstract string SimpleRepresentation();
+    public abstract double Value { get; }
 
-        public SyntaxNode Parent { get => parent; set => parent = value; }
+    public abstract string SimpleRepresentation { get; }
+    public SyntaxNode? Parent { get => parent; set => parent = value; }
 
-        public override string ToString()
-        {
-            return this.SimpleRepresentation();
-        }
+    public override string ToString() => this.SimpleRepresentation;
 
-        public abstract string toInfixNotation();
-        public abstract string toPostfixNotation();
-    }
+    public abstract string ToInfixNotation();
+    public abstract string ToPostfixNotation();
+
 }

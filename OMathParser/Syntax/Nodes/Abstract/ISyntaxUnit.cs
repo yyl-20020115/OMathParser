@@ -1,12 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace OMathParser.Syntax.Nodes.Abstract;
 
-namespace OMathParser.Syntax.Nodes.Abstract
+public interface ISyntaxUnit
 {
-    public interface ISyntaxUnit
-    {
-    }
 }

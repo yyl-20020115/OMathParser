@@ -1,37 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using OMathParser.Syntax.Nodes.Abstract;
+﻿using OMathParser.Syntax.Nodes.Abstract;
 
 namespace OMathParser.Syntax.Nodes
 {
-    public class DivisionNode : BinaryNode
+    public class DivisionNode(SyntaxNode left, SyntaxNode right) : BinaryNode(left, right)
     {
-        public DivisionNode(SyntaxNode left, SyntaxNode right) : base(left, right)
-        {
-        }
+        public override double Value => left.Value / right.Value;
 
-        public override double getValue()
-        {
-            return left.getValue() / right.getValue();
-        }
+        public override string SimpleRepresentation => $"Div: {left.SimpleRepresentation} / {right.SimpleRepresentation} ";
 
-        public override string SimpleRepresentation()
-        {
-            return string.Format("Div: {0} / {1} ", left.SimpleRepresentation(), right.SimpleRepresentation());
-        }
+        public override string ToInfixNotation() => base.ToInfixNotation("÷");
 
-        public override string toInfixNotation()
-        {
-            return base.toInfixNotation("÷");
-        }
-
-        public override string toPostfixNotation()
-        {
-            return base.toPostfixNotation("÷");
-        }
+        public override string ToPostfixNotation() => base.ToPostfixNotation("÷");
     }
 }

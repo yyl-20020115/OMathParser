@@ -1,41 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using OMathParser.Tokens.OXMLTokens.Abstract;
 
-using OMathParser.Tokens.OXMLTokens.Abstract;
+namespace OMathParser.Tokens.OXMLTokens;
 
-namespace OMathParser.Tokens.OXMLTokens
+public class SubscriptToken(TokenList subBase, TokenList subArgument) : AbstractToken()
 {
-    public class SubscriptToken : AbstractToken
-    {
-        private TokenList subBase;
-        private TokenList subArgument;
+    private readonly TokenList subBase = subBase;
+    private readonly TokenList subArgument = subArgument;
 
-        public SubscriptToken(TokenList subBase, TokenList subArgument)
-            : base()
-        {
-            this.subBase = subBase;
-            this.subArgument = subArgument;
-        }
+    public void AddBaseToken(IToken t) => subBase.Append(t);
+    public void AddSubArgumentToken(IToken t) => subArgument.Append(t);
 
-        public void addBaseToken(IToken t)
-        {
-            subBase.Append(t);
-        }
 
-        public void addSubArgumentToken(IToken t)
-        {
-            subArgument.Append(t);
-        }
+    public override string SimpleRepresentation => $"Subscript: base=({subBase.SimpleRepresentation}), arg=({subArgument.SimpleRepresentation})";
 
-        public override string SimpleRepresentation()
-        {
-            return String.Format("Subscript: base=({0}), arg=({1})", subBase.SimpleRepresentation(), subArgument.SimpleRepresentation());
-        }
-
-        public TokenList Base => subBase;
-        public TokenList Subscript => subArgument;
-    }
+    public TokenList Base => subBase;
+    public TokenList Subscript => subArgument;
 }
