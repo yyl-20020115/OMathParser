@@ -20,6 +20,7 @@ using System.IO;
 using OMathParser.Tokens;
 using OMathParser.Syntax;
 using OMathParser.Utils;
+using OxyPlot.Wpf;
 
 namespace OMathPlotter.Forms
 {
@@ -68,7 +69,7 @@ namespace OMathPlotter.Forms
 
             ResumeLayout(true);
 
-            String myDocumentsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            string myDocumentsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
             openOXMLFileDialog.InitialDirectory = myDocumentsPath;
             openOXMLFileDialog.Filter = "Office Open XML Wordprocessing document (*.docx)|*.docx";
         }
@@ -113,7 +114,7 @@ namespace OMathPlotter.Forms
         private void openFileMenuItem_Click(object sender, EventArgs e)
         {
             if (openOXMLFileDialog.ShowDialog() == DialogResult.OK
-                && !String.IsNullOrEmpty(openOXMLFileDialog.FileName))
+                && !string.IsNullOrEmpty(openOXMLFileDialog.FileName))
             {
                 try
                 {
@@ -124,7 +125,7 @@ namespace OMathPlotter.Forms
                 }
                 catch (Exception ex)
                 {
-                    String fileName = Path.GetFileName(openOXMLFileDialog.FileName);
+                    string fileName = Path.GetFileName(openOXMLFileDialog.FileName);
                     string title = "Error opening file";
                     string message = "Couldn't open \"" + fileName + "\"";
                     if (ex is OpenXmlPackageException || ex is FileFormatException)
