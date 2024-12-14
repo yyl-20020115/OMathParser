@@ -58,7 +58,7 @@ public abstract class BaseOXMLParser(ParseProperties properties)
         {
             return null;
         }
-        
+
     }
 
     protected IToken PollNextInput() => input.Dequeue();
@@ -91,7 +91,7 @@ public abstract class BaseOXMLParser(ParseProperties properties)
             {
                 while (true)
                 {
-                    Lexeme stackTop = operatorStack.Peek();
+                    var stackTop = operatorStack.Peek();
                     if (stackTop.Type == Lexeme.LexemeType.LEFT_PAREN)
                     {
                         break;
@@ -125,7 +125,7 @@ public abstract class BaseOXMLParser(ParseProperties properties)
             {
                 while (true)
                 {
-                    Lexeme stackTop = operatorStack.Peek();
+                    var stackTop = operatorStack.Peek();
                     if (stackTop.Type == Lexeme.LexemeType.LEFT_PAREN)
                     {
                         break;
@@ -154,31 +154,31 @@ public abstract class BaseOXMLParser(ParseProperties properties)
     protected void PushValueProducerToOutput(IToken t)
     {
         ISyntaxUnit processed;
-        if (t is Lexeme)
+        if (t is Lexeme lexeme)
         {
-            processed = ProcessValueProducerLexeme(t as Lexeme);
+            processed = ProcessValueProducerLexeme(lexeme);
         }
         else
         {
-            if (t is FractionToken)
+            if (t is FractionToken ft)
             {
-                processed = ProcessFraction(t as FractionToken);
+                processed = ProcessFraction(ft);
             }
-            else if (t is FunctionApplyToken)
+            else if (t is FunctionApplyToken fa)
             {
-                processed = ProcessFuncApplyToken(t as FunctionApplyToken);
+                processed = ProcessFuncApplyToken(fa);
             }
-            else if (t is ParenthesesToken)
+            else if (t is ParenthesesToken pt)
             {
-                processed = ProcessParenthesesToken(t as ParenthesesToken);
+                processed = ProcessParenthesesToken(pt);
             }
-            else if (t is SuperscriptToken)
+            else if (t is SuperscriptToken st)
             {
-                processed = ProcessSuperscriptToken(t as SuperscriptToken);
+                processed = ProcessSuperscriptToken(st);
             }
-            else if (t is RadicalToken)
+            else if (t is RadicalToken rt)
             {
-                processed = ProcessRadicalToken(t as RadicalToken);
+                processed = ProcessRadicalToken(rt);
             }
             else if (t is SubscriptToken)
             {
@@ -195,19 +195,18 @@ public abstract class BaseOXMLParser(ParseProperties properties)
         lastProcessedElement = processed;
     }
 
-    protected bool CanProduceValue(Object token)
+    protected bool CanProduceValue(Object? token)
     {
         if (token is SyntaxNode)
         {
             return true;
         }
-        else if (token is Lexeme)
+        else if (token is Lexeme lexme)
         {
-            Lexeme l = token as Lexeme;
-            Lexeme.LexemeType t = l.Type;
+            Lexeme.LexemeType t = lexme.Type;
             return t == Lexeme.LexemeType.REAL_VALUE ||
-                    properties.IsConstant(l.Value) ||
-                    properties.IsVariable(l.Value);
+                    properties.IsConstant(lexme.Value) ||
+                    properties.IsVariable(lexme.Value);
         }
         else
         {
@@ -248,17 +247,17 @@ public abstract class BaseOXMLParser(ParseProperties properties)
         {
             return true;
         }
-        else if (lastProcessedElement is Lexeme)
+        else if (lastProcessedElement is Lexeme previous)
         {
-            Lexeme previous = lastProcessedElement as Lexeme;
-            Lexeme.LexemeType type = previous.Type;
-            return type == Lexeme.LexemeType.LEFT_PAREN ||
-                    type == Lexeme.LexemeType.EQ_SIGN ||
-                    type == Lexeme.LexemeType.OP_DIV ||
-                    type == Lexeme.LexemeType.OP_MUL ||
-                    type == Lexeme.LexemeType.OP_MINUS ||
-                    type == Lexeme.LexemeType.OP_PLUS ||
-                    type == Lexeme.LexemeType.ARGUMENT_SEPARATOR;
+            return previous.Type is
+                Lexeme.LexemeType.LEFT_PAREN or
+                Lexeme.LexemeType.EQ_SIGN or
+                Lexeme.LexemeType.OP_DIV or
+                Lexeme.LexemeType.OP_MUL or
+                Lexeme.LexemeType.OP_MINUS or
+                Lexeme.LexemeType.OP_PLUS or
+                Lexeme.LexemeType.ARGUMENT_SEPARATOR
+                ;
         }
         else
         {
@@ -277,10 +276,9 @@ public abstract class BaseOXMLParser(ParseProperties properties)
         Lexeme.LexemeType lt = lexeme.Type;
         if (lt == Lexeme.LexemeType.REAL_VALUE)
         {
-            double value;
-            if (!double.TryParse(lexeme.Value, NumberStyles.Any, CultureInfo.InvariantCulture, out value))
+            if (!double.TryParse(lexeme.Value, NumberStyles.Any, CultureInfo.InvariantCulture, out double value))
             {
-                throw new ParseException("Couldn't parse literal value: " + lexeme.Value);
+                throw new ParseException($"Couldn't parse literal value: {lexeme.Value}");
             }
             return new LiteralNode(value);
         }
@@ -290,7 +288,7 @@ public abstract class BaseOXMLParser(ParseProperties properties)
         }
         else if (properties.IsConstant(lexeme.Value))
         {
-            Double value = properties.GetConstantValue(lexeme.Value);
+            var value = properties.GetConstantValue(lexeme.Value);
             return new ConstantIdentifierNode(lexeme.Value, value);
         }
 
@@ -299,8 +297,8 @@ public abstract class BaseOXMLParser(ParseProperties properties)
 
     protected DivisionNode ProcessFraction(FractionToken fraction)
     {
-        TokenListParser fractionParser = new TokenListParser(properties);
-        
+        TokenListParser fractionParser = new (properties);
+
         SyntaxNode left = fractionParser.Parse(fraction.Numerator);
         SyntaxNode right = fractionParser.Parse(fraction.Denominator);
         return new DivisionNode(left, right);
@@ -311,10 +309,10 @@ public abstract class BaseOXMLParser(ParseProperties properties)
         TokenList fNameNode = func.FunctionName;
         if (fNameNode.Count == 1)
         {
-            if (fNameNode[0] is Lexeme)
+            if (fNameNode[0] is Lexeme lexeme)
             {
                 // Samo naziv funkcije u fName, bez ikakvih eksponenata i sl.
-                string functionName = (fNameNode[0] as Lexeme).Value;
+                var functionName = lexeme.Value;
                 if (properties.IsFunctionName(functionName))
                 {
                     int nArguments = properties.GetFunctionArgumentsCount(functionName);
@@ -324,20 +322,19 @@ public abstract class BaseOXMLParser(ParseProperties properties)
                     {
                         throw new ParseException(
                             "Number of arguments given doesn't match function declaration for function: " +
-                            func.                                SimpleRepresentation);
+                            func.SimpleRepresentation);
                     }
 
                     FunctionApplyNode.FunctionBody definition = properties.GetFunctionDefinition(functionName);
                     return new FunctionApplyNode(arguments, definition, functionName);
                 }
             }
-            else if (fNameNode[0] is SuperscriptToken)
+            else if (fNameNode[0] is SuperscriptToken sup)
             {
                 // eksponent u nazivu funkcije, npr. sin^-1(x)
-                SuperscriptToken sup = fNameNode[0] as SuperscriptToken;
-                if (sup.Base.Count == 1 && sup.Base[0] is TextRunToken)
+                if (sup.Base.Count == 1 && sup.Base[0] is TextRunToken text)
                 {
-                    string functionName = (sup.Base[0] as TextRunToken).Text;
+                    string functionName = text.Text;
                     if (properties.IsFunctionName(functionName))
                     {
                         int nArguments = properties.GetFunctionArgumentsCount(functionName);
@@ -347,14 +344,14 @@ public abstract class BaseOXMLParser(ParseProperties properties)
                         {
                             throw new ParseException(
                                 "Number of arguments given doesn't match function declaration for function: " +
-                                func.                                    SimpleRepresentation);
+                                func.SimpleRepresentation);
                         }
 
-                        TokenListParser exponentParser = new TokenListParser(properties);
+                        TokenListParser exponentParser = new(properties);
                         SyntaxNode exponentArgument = exponentParser.Parse(sup.Argument);
 
                         FunctionApplyNode.FunctionBody definition = properties.GetFunctionDefinition(functionName);
-                        FunctionApplyNode exponentBase = new FunctionApplyNode(arguments, definition, functionName);
+                        FunctionApplyNode exponentBase = new (arguments, definition, functionName);
 
                         return new PowerNode(exponentBase, exponentArgument);
                     }
@@ -362,19 +359,19 @@ public abstract class BaseOXMLParser(ParseProperties properties)
             }
         }
 
-        throw new ParseException("Can't process function name: " + func.SimpleRepresentation);
+        throw new ParseException($"Can't process function name: {func.SimpleRepresentation}");
     }
 
     protected SyntaxNode ProcessParenthesesToken(ParenthesesToken parentheses)
     {
-        TokenListParser listParser = new TokenListParser(properties);
+        TokenListParser listParser = new(properties);
         return listParser.Parse(parentheses.Elements);
     }
 
     protected PowerNode ProcessSuperscriptToken(SuperscriptToken superscript)
     {
-        TokenListParser supParser = new TokenListParser(properties);
-        
+        TokenListParser supParser = new(properties);
+
         SyntaxNode baseNode = supParser.Parse(superscript.Base);
         SyntaxNode argumentNode = supParser.Parse(superscript.Argument);
 
@@ -383,7 +380,7 @@ public abstract class BaseOXMLParser(ParseProperties properties)
 
     protected RadicalNode ProcessRadicalToken(RadicalToken radical)
     {
-        TokenListParser radicalParser = new TokenListParser(properties);
+        TokenListParser radicalParser = new(properties);
 
         SyntaxNode baseNode = radicalParser.Parse(radical.Base);
         SyntaxNode degreeNode = radicalParser.Parse(radical.Degree);
@@ -393,14 +390,14 @@ public abstract class BaseOXMLParser(ParseProperties properties)
 
     protected ArgumentListNode ParseArgumentList(TokenList argumentList, int argumentsNeeded)
     {
-        ArgumentTokenListParser argumentListParser = new ArgumentTokenListParser(properties);
+        ArgumentTokenListParser argumentListParser = new(properties);
         return argumentListParser.Parse(argumentList, argumentsNeeded);
     }
 
     protected ArgumentListNode ParseArgumentList(ParenthesesToken argumentList, int argumentsNeeded)
     {
         //List<SyntaxNode> processedArguments = new List<SyntaxNode>();
-        ArgumentTokenListParser argumentListParser = new ArgumentTokenListParser(properties);
+        ArgumentTokenListParser argumentListParser = new(properties);
         return argumentListParser.Parse(argumentList.Elements, argumentsNeeded);
     }
 
@@ -408,14 +405,13 @@ public abstract class BaseOXMLParser(ParseProperties properties)
     {
         if (argumentList.BeginChar != '(' || argumentList.EndChar != ')' || argumentList.Delimiter != ',')
         {
-            throw new ParseException(argumentList.SimpleRepresentation +
-                " cannot be used as an argument list for a function call.");
+            throw new ParseException($"{argumentList.SimpleRepresentation} cannot be used as an argument list for a function call.");
         }
 
-        ArgumentListNode argumentListNode = new ArgumentListNode();
+        ArgumentListNode argumentListNode = new();
         foreach (TokenList argument in argumentList.Elements)
         {
-            TokenListParser argumentParser = new TokenListParser(properties);
+            TokenListParser argumentParser = new(properties);
             SyntaxNode argumentRootNode = argumentParser.Parse(argument);
             argumentListNode.AddArgument(argumentRootNode);
         }
@@ -426,34 +422,33 @@ public abstract class BaseOXMLParser(ParseProperties properties)
     protected void ProcessFunctionNameLexeme(Lexeme fName)
     {
         IToken next = PollNextInput();
-        if (next is ParenthesesToken)
+        if (next is ParenthesesToken p)
         {
             int nArguments = properties.GetFunctionArgumentsCount(fName.Value);
-            ArgumentListNode arguments = ParseArgumentList(next as ParenthesesToken, nArguments);
+            ArgumentListNode arguments = ParseArgumentList(p, nArguments);
 
             if (arguments.Count != nArguments)
             {
                 throw new ParseException(
-                    "Number of arguments given doesn't match function declaration for function: " + fName.Value);
+                    $"Number of arguments given doesn't match function declaration for function: {fName.Value}");
             }
 
             FunctionApplyNode.FunctionBody funcDefinition = properties.GetFunctionDefinition(fName.Value);
 
-            FunctionApplyNode funcApplyNode = new FunctionApplyNode(arguments, funcDefinition, fName.Value);
+            FunctionApplyNode funcApplyNode = new(arguments, funcDefinition, fName.Value);
             output.Enqueue(funcApplyNode);
             lastProcessedElement = funcApplyNode;
         }
-        else if (next is Lexeme && (next as Lexeme).Type == Lexeme.LexemeType.LEFT_PAREN)
+        else if (next is Lexeme lexeme && lexeme.Type == Lexeme.LexemeType.LEFT_PAREN)
         {
             openedArgumentLists++;
             operatorStack.Push(fName);
-            operatorStack.Push(next as Lexeme);
-            lastProcessedElement = next as Lexeme;
+            operatorStack.Push(lexeme);
+            lastProcessedElement = lexeme;
         }
         else
         {
-            throw new ParseException("Missing argument list for function call: "
-                + fName.Value + " " + next.SimpleRepresentation);
+            throw new ParseException($"Missing argument list for function call: {fName.Value} {next.SimpleRepresentation}");
         }
     }
 
@@ -477,9 +472,8 @@ public abstract class BaseOXMLParser(ParseProperties properties)
                 {
                     // Ako je na vrhu stoga ostalo ime funkcije, prebacujemo ga u izlaz
                     IToken stackTop = operatorStack.Peek();
-                    if (stackTop is Lexeme && properties.IsFunctionName((stackTop as Lexeme).Value))
+                    if (stackTop is Lexeme funcName && properties.IsFunctionName(funcName.Value))
                     {
-                        Lexeme funcName = stackTop as Lexeme;
                         output.Enqueue(funcName);
                         operatorStack.Pop();
                         openedArgumentLists--;
@@ -499,7 +493,7 @@ public abstract class BaseOXMLParser(ParseProperties properties)
         }
     }
 
-    protected void ProcessArgumentSeparator()
+    protected virtual void ProcessArgumentSeparator()
     {
         if (openedArgumentLists < 1)
         {
@@ -540,31 +534,30 @@ public abstract class BaseOXMLParser(ParseProperties properties)
 
     protected SyntaxNode BuildSyntaxTree(List<ISyntaxUnit> postfixForm)
     {
-        Queue<ISyntaxUnit> inputQueue = new Queue<ISyntaxUnit>(postfixForm);
-        Stack<SyntaxNode> operandStack = new Stack<SyntaxNode>();
+        Queue<ISyntaxUnit> inputQueue = new(postfixForm);
+        Stack<SyntaxNode> operandStack = new();
         while (inputQueue.Count > 0)
         {
             ISyntaxUnit input = inputQueue.Dequeue();
-            if (input is Lexeme)
+            if (input is Lexeme token)
             {
-                Lexeme token = input as Lexeme;
                 Lexeme.LexemeType ttype = token.Type;
                 if (properties.IsVariable(token.Value))
                 {
-                    VariableIdentifierNode variable = new VariableIdentifierNode(token.Value);
+                    VariableIdentifierNode variable = new (token.Value);
                     operandStack.Push(variable);
                 }
                 else if (properties.IsConstant(token.Value))
                 {
                     double constantValue = properties.GetConstantValue(token.Value);
-                    ConstantIdentifierNode constant = new ConstantIdentifierNode(token.Value, constantValue);
+                    ConstantIdentifierNode constant = new (token.Value, constantValue);
                     operandStack.Push(constant);
                 }
                 else if (properties.IsFunctionName(token.Value))
                 {
                     int nArguments = properties.GetFunctionArgumentsCount(token.Value);
                     FunctionApplyNode.FunctionBody funcBody = properties.GetFunctionDefinition(token.Value);
-                    ArgumentListNode argumentList = new ArgumentListNode();
+                    ArgumentListNode argumentList = new ();
                     try
                     {
                         for (int i = 0; i < nArguments; i++)
@@ -577,17 +570,16 @@ public abstract class BaseOXMLParser(ParseProperties properties)
                         throw new ParseException("Not enough operands on operand stack for function call.");
                     }
 
-                    FunctionApplyNode functionCall = new FunctionApplyNode(argumentList, funcBody, token.Value);
+                    FunctionApplyNode functionCall = new (argumentList, funcBody, token.Value);
                     operandStack.Push(functionCall);
                 }
                 else if (ttype == Lexeme.LexemeType.REAL_VALUE)
                 {
-                    double value;
-                    if (!double.TryParse(token.Value, NumberStyles.Any, CultureInfo.InvariantCulture, out value))
+                    if (!double.TryParse(token.Value, NumberStyles.Any, CultureInfo.InvariantCulture, out double value))
                     {
                         throw new ParseException("Couldn't parse literal value: " + token.Value);
                     }
-                    LiteralNode literal = new LiteralNode(value);
+                    LiteralNode literal = new (value);
                     operandStack.Push(literal);
                 }
                 else if (ttype == Lexeme.LexemeType.OP_PLUS)
@@ -596,7 +588,7 @@ public abstract class BaseOXMLParser(ParseProperties properties)
                     {
                         SyntaxNode right = operandStack.Pop();
                         SyntaxNode left = operandStack.Pop();
-                        AdditionNode addition = new AdditionNode(left, right);
+                        AdditionNode addition = new (left, right);
                         operandStack.Push(addition);
                     }
                     catch (InvalidOperationException ex)
@@ -610,7 +602,7 @@ public abstract class BaseOXMLParser(ParseProperties properties)
                     {
                         SyntaxNode right = operandStack.Pop();
                         SyntaxNode left = operandStack.Pop();
-                        SubtractionNode subtraction = new SubtractionNode(left, right);
+                        SubtractionNode subtraction = new (left, right);
                         operandStack.Push(subtraction);
                     }
                     catch (InvalidOperationException ex)
@@ -624,7 +616,7 @@ public abstract class BaseOXMLParser(ParseProperties properties)
                     {
                         SyntaxNode right = operandStack.Pop();
                         SyntaxNode left = operandStack.Pop();
-                        MultiplicationNode multiplication = new MultiplicationNode(left, right);
+                        MultiplicationNode multiplication = new (left, right);
                         operandStack.Push(multiplication);
                     }
                     catch (InvalidOperationException ex)
@@ -638,7 +630,7 @@ public abstract class BaseOXMLParser(ParseProperties properties)
                     {
                         SyntaxNode right = operandStack.Pop();
                         SyntaxNode left = operandStack.Pop();
-                        DivisionNode division = new DivisionNode(left, right);
+                        DivisionNode division = new (left, right);
                         operandStack.Push(division);
                     }
                     catch (InvalidOperationException ex)
@@ -652,7 +644,7 @@ public abstract class BaseOXMLParser(ParseProperties properties)
                     {
                         SyntaxNode exponent = operandStack.Pop();
                         SyntaxNode baseNode = operandStack.Pop();
-                        PowerNode power = new PowerNode(baseNode, exponent);
+                        PowerNode power = new (baseNode, exponent);
                         operandStack.Push(power);
                     }
                     catch (InvalidOperationException ex)
@@ -666,7 +658,7 @@ public abstract class BaseOXMLParser(ParseProperties properties)
                     {
                         SyntaxNode right = operandStack.Pop();
                         SyntaxNode left = operandStack.Pop();
-                        EqualsNode eqNode = new EqualsNode(left, right);
+                        EqualsNode eqNode = new (left, right);
                         operandStack.Push(eqNode);
                     }
                     catch (InvalidOperationException ex)
@@ -679,7 +671,7 @@ public abstract class BaseOXMLParser(ParseProperties properties)
                     try
                     {
                         SyntaxNode child = operandStack.Pop();
-                        UnaryPlusNode unaryPlus = new UnaryPlusNode(child);
+                        UnaryPlusNode unaryPlus = new (child);
                         operandStack.Push(unaryPlus);
                     }
                     catch (InvalidOperationException ex)
@@ -692,7 +684,7 @@ public abstract class BaseOXMLParser(ParseProperties properties)
                     try
                     {
                         SyntaxNode child = operandStack.Pop();
-                        UnaryMinusNode unaryMinus = new UnaryMinusNode(child);
+                        UnaryMinusNode unaryMinus = new (child);
                         operandStack.Push(unaryMinus);
                     }
                     catch (InvalidOperationException ex)

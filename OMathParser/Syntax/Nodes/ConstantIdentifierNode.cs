@@ -4,8 +4,8 @@ namespace OMathParser.Syntax.Nodes;
 
 public class ConstantIdentifierNode(string name, double value) : SyntaxNode
 {
-    private string name = name;
-    private double value = value;
+    private readonly string name = name;
+    private readonly double value = value;
 
     public override double Value => value;
 

@@ -20,7 +20,7 @@ public class TokenList : List<IToken>, IToken, ISimplifiable
             this.Append(item);
         }
     }
-    public TokenList(Int32 capacity) : base(capacity) { }
+    public TokenList(int capacity) : base(capacity) { }
 
     public void Append(IToken token)
     {

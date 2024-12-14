@@ -19,10 +19,7 @@ public class ArgumentListNode : ISimplifiable, IEnumerable<SyntaxNode>
 
     public void AddArgument(SyntaxNode argument) => arguments.Add(argument);
 
-    public SyntaxNode GetArgument(int index)
-    {
-        return arguments[index];
-    }
+    public SyntaxNode this[int index] => arguments[index];
 
     public string SimpleRepresentation
     {

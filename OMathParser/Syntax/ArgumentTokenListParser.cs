@@ -26,11 +26,11 @@ public class ArgumentTokenListParser(ParseProperties properties) : BaseOXMLParse
 
         ConstructArguments();
 
-        if (processedArguments.Count() < argumentsNeeded)
+        if (processedArguments.Count < argumentsNeeded)
         {
             throw new ParseException("Too few arguments given for function call.");
         }
-        else if (processedArguments.Count() > argumentsNeeded)
+        else if (processedArguments.Count > argumentsNeeded)
         {
             throw new ParseException("Too many arguments given for function call.");
         }
@@ -54,10 +54,10 @@ public class ArgumentTokenListParser(ParseProperties properties) : BaseOXMLParse
             {
                 if (OutputCount > 0)
                 {
-                    constructSingleArgument();
+                    ConstructSingleArgument();
                 }
 
-                if (processedArguments.Count() < argumentsNeeded)
+                if (processedArguments.Count < argumentsNeeded)
                 {
                     throw new ParseException("Too few arguments successfully parsed.");
                 }
@@ -70,9 +70,8 @@ public class ArgumentTokenListParser(ParseProperties properties) : BaseOXMLParse
                 // LexemeTypes: REAL_VALUE, IDENTIFIER_CONST and IDENTIFIER_VAR are processed here
                 PushValueProducerToOutput(current);
             }
-            else if (current is Lexeme)
+            else if (current is Lexeme currentLexeme)
             {
-                Lexeme currentLexeme = current as Lexeme;
                 Lexeme.LexemeType type = currentLexeme.Type;
                 if (properties.IsFunctionName(currentLexeme.Value))
                 {
@@ -127,7 +126,7 @@ public class ArgumentTokenListParser(ParseProperties properties) : BaseOXMLParse
         }
     }
 
-    protected void ProcessArgumentSeparator()
+    protected override void ProcessArgumentSeparator()
     {
         if (openedArgumentLists == 0)
         {
@@ -136,7 +135,7 @@ public class ArgumentTokenListParser(ParseProperties properties) : BaseOXMLParse
             // In that case the operator stack is emptied and the resulting postfix output
             // represents a single argument which needs to be converted to a syntax tree
             // and added to the processed arguments list.
-            constructSingleArgument();
+            ConstructSingleArgument();
         }
         else
         {
@@ -171,7 +170,7 @@ public class ArgumentTokenListParser(ParseProperties properties) : BaseOXMLParse
         }
     }
 
-    private void constructSingleArgument()
+    private void ConstructSingleArgument()
     {
         while (true)
         {

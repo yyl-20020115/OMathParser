@@ -31,7 +31,7 @@ public class TokenListParser(ParseProperties properties) : BaseOXMLParser(proper
                 {
                     while (operatorStack.Count > 0)
                     {
-                        Lexeme op = operatorStack.Pop();
+                        var op = operatorStack.Pop();
                         output.Enqueue(op);
                     }
 
@@ -44,9 +44,8 @@ public class TokenListParser(ParseProperties properties) : BaseOXMLParser(proper
                 // LexemeTypes: REAL_VALUE, IDENTIFIER_CONST and IDENTIFIER_VAR are processed here
                 PushValueProducerToOutput(current);
             }
-            else if (current is Lexeme)
+            else if (current is Lexeme currentLexeme)
             {
-                Lexeme currentLexeme = current as Lexeme;
                 Lexeme.LexemeType type = currentLexeme.Type;
                 if (properties.IsFunctionName(currentLexeme.Value))
                 {
@@ -103,7 +102,7 @@ public class TokenListParser(ParseProperties properties) : BaseOXMLParser(proper
 
     public SyntaxNode Parse(TokenList infix)
     {
-        List<ISyntaxUnit> postfixForm = ConvertToPostfix(infix);
+        var postfixForm = ConvertToPostfix(infix);
         return BuildSyntaxTree(postfixForm);
     }
 }

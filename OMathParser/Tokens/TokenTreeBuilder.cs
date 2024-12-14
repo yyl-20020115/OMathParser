@@ -20,7 +20,7 @@ public class TokenTreeBuilder(ParseProperties parseProperties)
     private readonly ParseProperties parseProperties = parseProperties;
     private readonly Tokenizer textRunTokenizer = new (parseProperties);
 
-    private readonly ISet<Lexeme> foundIdentifiers = new HashSet<Lexeme>();
+    private readonly HashSet<Lexeme> foundIdentifiers = [];
 
     public TokenTree Build(OfficeMath expression)
     {
@@ -39,9 +39,9 @@ public class TokenTreeBuilder(ParseProperties parseProperties)
 
     private IToken ProcessElement(OpenXmlElement e)
     {
-        if (e is Run)
+        if (e is Run run)
         {
-            TokenList lexemes = ProcessRun(e as Run);
+            TokenList lexemes = ProcessRun(run);
             foreach (IToken l in lexemes)
             {
                 if (l is Lexeme lex && lex.Type == Lexeme.LexemeType.IDENTIFIER)
@@ -51,29 +51,29 @@ public class TokenTreeBuilder(ParseProperties parseProperties)
             }
             return lexemes;
         }
-        else if (e is Fraction)
+        else if (e is Fraction f)
         {
-            return ProcessFraction(e as Fraction);
+            return ProcessFraction(f);
         }
-        else if (e is Subscript)
+        else if (e is Subscript s)
         {
-            return ProcessSubScript(e as Subscript);
+            return ProcessSubScript(s);
         }
-        else if (e is Superscript)
+        else if (e is Superscript u)
         {
-            return ProcessSupScript(e as Superscript);
+            return ProcessSupScript(u);
         }
-        else if (e is Radical)
+        else if (e is Radical r)
         {
-            return ProcessRadical(e as Radical);
+            return ProcessRadical(r);
         }
-        else if (e is Delimiter)
+        else if (e is Delimiter d)
         {
-            return ProcessDelimiter(e as Delimiter);
+            return ProcessDelimiter(d);
         }
-        else if (e is MathFunction)
+        else if (e is MathFunction m)
         {
-            return ProcessMathFunction(e as MathFunction);
+            return ProcessMathFunction(m);
         }
         else if (e is BookmarkStart || e is BookmarkEnd)
         {
@@ -81,7 +81,7 @@ public class TokenTreeBuilder(ParseProperties parseProperties)
         }
         else
         {
-            throw new NotImplementedException("No handler implemented for " + e.GetType().FullName);
+            throw new NotImplementedException($"No handler implemented for {e.GetType().FullName}");
         }
     }
 
@@ -104,12 +104,12 @@ public class TokenTreeBuilder(ParseProperties parseProperties)
         TokenList denominator = [];
         TokenList numerator = [];
 
-        foreach (var child in f.Denominator)
+        foreach (var child in f.Denominator ?? [])
         {
             denominator.Append(ProcessElement(child));
         }
 
-        foreach (var child in f.Numerator)
+        foreach (var child in f.Numerator ?? [])
         {
             numerator.Append(ProcessElement(child));
         }
@@ -122,12 +122,12 @@ public class TokenTreeBuilder(ParseProperties parseProperties)
         TokenList subBase = [];
         TokenList argument = [];
 
-        foreach (var child in s.Base)
+        foreach (var child in s.Base ?? [])
         {
             subBase.Append(ProcessElement(child));
         }
 
-        foreach (var child in s.SubArgument)
+        foreach (var child in s.SubArgument ?? [])
         {
             argument.Append(ProcessElement(child));
         }
@@ -140,12 +140,12 @@ public class TokenTreeBuilder(ParseProperties parseProperties)
         TokenList supBase = [];
         TokenList argument = [];
 
-        foreach (var child in s.Base)
+        foreach (var child in s.Base ?? [])
         {
             supBase.Append(ProcessElement(child));
         }
 
-        foreach (var child in s.SuperArgument)
+        foreach (var child in s.SuperArgument ?? [])
         {
             argument.Append(ProcessElement(child));
         }
@@ -164,13 +164,13 @@ public class TokenTreeBuilder(ParseProperties parseProperties)
         }
         else
         {
-            foreach (var child in r.Degree)
+            foreach (var child in r.Degree ?? [])
             {
                 degree.Append(ProcessElement(child));
             }
         }
 
-        foreach (var child in r.Base)
+        foreach (var child in r.Base ?? [])
         {
             radBase.Append(ProcessElement(child));
         }
@@ -188,7 +188,7 @@ public class TokenTreeBuilder(ParseProperties parseProperties)
         if (delimiterElements.Count() > 1)
         {
             char separator = dp.SeparatorChar == null ? '|' : dp.SeparatorChar.Val.ToString().Trim().ElementAt(0);
-            DelimiterToken delimiterToken = new DelimiterToken(beginChar, endChar, separator);
+            var delimiterToken = new DelimiterToken(beginChar, endChar, separator);
 
             foreach (var element in delimiterElements)
             {
@@ -211,12 +211,12 @@ public class TokenTreeBuilder(ParseProperties parseProperties)
         TokenList funcName = [];
         TokenList funcBase = [];
 
-        foreach (var child in f.FunctionName)
+        foreach (var child in f.FunctionName ?? [])
         {
             funcName.Append(ProcessElement(child));
         }
 
-        foreach (var child in f.Base)
+        foreach (var child in f.Base ?? [])
         {
             funcBase.Append(ProcessElement(child));
         }
